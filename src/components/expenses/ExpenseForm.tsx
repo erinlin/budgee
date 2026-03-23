@@ -247,7 +247,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ trip, initialData, onS
                   <button
                     type="button"
                     className="flex items-center gap-1 text-sm"
-                    style={{ color: 'var(--color-primary)' }}
+                    style={{ color: 'var(--color-primary)', border: '1.5px solid var(--color-primary)', borderRadius: 'var(--radius-md)', padding: '4px 10px', background: 'transparent' }}
                     onClick={toggleAllMembers}
                   >
                     {selectedMembers.length === trip.members.length

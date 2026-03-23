@@ -125,6 +125,7 @@ export const ExpenseTypes: React.FC = () => {
             onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
             placeholder="例如：交通費"
             error={!!formError}
+            autoComplete="off"
           />
           {formError && <p className="text-red-500 mt-2 text-base font-medium">{formError}</p>}
         </div>
@@ -207,7 +208,10 @@ export const ExpenseTypes: React.FC = () => {
       <section>
         <h2 className="text-xl font-bold mb-4">內建類型</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-sm)' }}>
-          {builtInTypes.map((type) => (
+          {builtInTypes.map((type) =>
+            editingId === type.id ? (
+              <TypeForm key={type.id} />
+            ) : (
             <div key={type.id} className="member-card-row">
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
@@ -228,7 +232,7 @@ export const ExpenseTypes: React.FC = () => {
                   </div>
                 )}
               </div>
-              {!isArchived && editingId !== type.id && (
+              {!isArchived && (
                 <button
                   className="icon-btn"
                   onClick={() => handleEditClick(type.id)}
@@ -238,7 +242,8 @@ export const ExpenseTypes: React.FC = () => {
                 </button>
               )}
             </div>
-          ))}
+            )
+          )}
         </div>
       </section>
 

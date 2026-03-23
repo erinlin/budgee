@@ -1,5 +1,3 @@
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import type { Trip, Expense, Collection } from '../types';
 import { fmt } from './fmt';
 import { db } from '../db';
@@ -40,115 +38,89 @@ export async function exportTripAsPdf(tripId: string): Promise<void> {
 
   const expenses = await db.expenses.where({ tripId }).sortBy('date');
   const collections = await db.collections.where({ tripId }).toArray();
+  const balances = calcBalances(trip, expenses, collections);
 
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-
-  // jsPDF 預設不支援 CJK，使用 UTF-8 模式盡量渲染
-  // 若需完整 CJK 支援，需嵌入 NotoSansCJK 字型
-
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const margin = 15;
-
-  // ===== 標題區 =====
-  doc.setFontSize(22);
-  doc.setFont('helvetica', 'bold');
-  doc.text(trip.title, margin, 20);
-
-  doc.setFontSize(12);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(100, 100, 100);
-  doc.text(`${trip.startDate} - ${trip.endDate}`, margin, 28);
-  doc.text(`成員: ${trip.members.length} 人`, margin, 35);
-  if (trip.description) {
-    doc.text(trip.description, margin, 42);
-  }
-  doc.setTextColor(0, 0, 0);
-
-  // ===== 花費明細表格 =====
-  let yStart = trip.description ? 52 : 48;
-
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text('花費明細', margin, yStart);
-  yStart += 6;
+  const formatDate = (d: string) => d.slice(5).replace('-', '/');
 
   const expenseRows = expenses.map(exp => {
-    const categoryLabel = exp.category === 'split' ? '分攤型' : '選項型';
     const paidBy = getMemberName(trip, exp.paidBy);
-    const splitMembers = exp.splits.map(s => {
-      const m = trip.members.find(m => m.id === s.memberId);
-      return m?.nickname ?? '';
-    }).filter(Boolean).join(', ');
-    return [
-      exp.date,
-      categoryLabel,
-      exp.title || '-',
-      fmt(exp.totalAmount),
-      paidBy,
-      splitMembers || '-',
-    ];
-  });
+    const splitMembers = exp.splits.map(s =>
+      trip.members.find(m => m.id === s.memberId)?.nickname ?? ''
+    ).filter(Boolean).join('、');
+    return `
+      <tr>
+        <td>${formatDate(exp.date)}</td>
+        <td>${exp.title || '—'}</td>
+        <td class="num">${fmt(exp.totalAmount)}</td>
+        <td>${paidBy}</td>
+        <td>${splitMembers || '—'}</td>
+      </tr>`;
+  }).join('');
 
-  autoTable(doc, {
-    startY: yStart,
-    head: [['日期', '類型', '標題', '金額', '代墊人', '分攤人']],
-    body: expenseRows,
-    styles: { fontSize: 10, cellPadding: 3 },
-    headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
-    alternateRowStyles: { fillColor: [248, 249, 250] },
-    margin: { left: margin, right: margin },
-    theme: 'grid',
-  });
+  const balanceRows = balances.map(b => {
+    const balanceLabel = b.balance > 0 ? '待繳' : b.balance < 0 ? '待退' : '結清';
+    const balanceClass = b.balance > 0 ? 'owe' : b.balance < 0 ? 'refund' : '';
+    return `
+      <tr>
+        <td>${b.name}</td>
+        <td class="num">${fmt(b.splitTotal)}</td>
+        <td class="num">${fmt(b.paidTotal)}</td>
+        <td class="num">${fmt(b.collectedTotal)}</td>
+        <td class="num ${balanceClass}">${fmt(Math.abs(b.balance))}（${balanceLabel}）</td>
+      </tr>`;
+  }).join('');
 
-  // ===== 每人收款摘要 =====
-  const finalY = (doc as any).lastAutoTable?.finalY ?? 100;
-  let summaryY = finalY + 12;
+  const html = `<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>${trip.title} - Budgee</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, 'PingFang TC', 'Noto Sans TC', sans-serif; font-size: 13px; color: #111; padding: 20mm 15mm; }
+    h1 { font-size: 22px; margin-bottom: 4px; }
+    .meta { color: #666; font-size: 12px; margin-bottom: 16px; }
+    h2 { font-size: 15px; margin: 20px 0 8px; border-bottom: 1.5px solid #2563eb; padding-bottom: 4px; color: #2563eb; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #2563eb; color: #fff; padding: 6px 8px; text-align: left; font-size: 12px; }
+    td { padding: 5px 8px; border-bottom: 1px solid #e5e7eb; font-size: 12px; }
+    tr:nth-child(even) td { background: #f8f9fa; }
+    .num { text-align: right; }
+    .owe { color: #dc2626; font-weight: 600; }
+    .refund { color: #16a34a; font-weight: 600; }
+    footer { margin-top: 24px; text-align: center; color: #aaa; font-size: 11px; }
+    @media print {
+      body { padding: 10mm 12mm; }
+      @page { size: A4; margin: 10mm; }
+    }
+  </style>
+</head>
+<body>
+  <h1>${trip.title}</h1>
+  <div class="meta">${trip.startDate} ～ ${trip.endDate}</div>
+  <div class="meta">旅伴：${trip.members.map(m => m.nickname).join('、')}</div>
 
-  if (summaryY > doc.internal.pageSize.getHeight() - 60) {
-    doc.addPage();
-    summaryY = 20;
+  <h2>花費明細</h2>
+  <table>
+    <thead><tr><th>日期</th><th>標題</th><th style="text-align:right">金額</th><th>代墊人</th><th>分攤人</th></tr></thead>
+    <tbody>${expenseRows || '<tr><td colspan="5" style="text-align:center;color:#999">尚無花費紀錄</td></tr>'}</tbody>
+  </table>
+
+  <h2>每人餘額摘要</h2>
+  <table>
+    <thead><tr><th>旅伴</th><th style="text-align:right">分攤</th><th style="text-align:right">代墊</th><th style="text-align:right">已收</th><th style="text-align:right">餘額</th></tr></thead>
+    <tbody>${balanceRows || '<tr><td colspan="5" style="text-align:center;color:#999">尚無成員</td></tr>'}</tbody>
+  </table>
+
+  <footer>Budgee｜${trip.title}｜匯出於 ${new Date().toLocaleDateString('zh-TW')}</footer>
+  <script>window.onload = () => { window.print(); }</script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (win) {
+    win.onafterprint = () => URL.revokeObjectURL(url);
   }
-
-  doc.setFontSize(16);
-  doc.setFont('helvetica', 'bold');
-  doc.text('每人收款摘要', margin, summaryY);
-  summaryY += 6;
-
-  const balances = calcBalances(trip, expenses, collections);
-  const summaryRows = balances.map(b => [
-    b.name,
-    fmt(b.splitTotal),
-    fmt(b.paidTotal),
-    fmt(b.collectedTotal),
-    `${fmt(Math.abs(b.balance))} ${b.balance > 0 ? '(待繳)' : b.balance < 0 ? '(待退)' : '(結清)'}`,
-  ]);
-
-  autoTable(doc, {
-    startY: summaryY,
-    head: [['成員', '分攤總計', '代墊總計', '已收總計', '餘額']],
-    body: summaryRows,
-    styles: { fontSize: 10, cellPadding: 3 },
-    headStyles: { fillColor: [37, 99, 235], textColor: 255, fontStyle: 'bold' },
-    alternateRowStyles: { fillColor: [248, 249, 250] },
-    margin: { left: margin, right: margin },
-    theme: 'grid',
-  });
-
-  // ===== 頁碼 =====
-  const pageCount = doc.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
-    doc.setPage(i);
-    doc.setFontSize(9);
-    doc.setTextColor(150, 150, 150);
-    doc.text(
-      `Budgee | ${trip.title} | ${i} / ${pageCount}`,
-      pageWidth / 2,
-      doc.internal.pageSize.getHeight() - 8,
-      { align: 'center' }
-    );
-  }
-
-  // 下載
-  const dateStr = new Date().toISOString().split('T')[0];
-  doc.save(`budgee-${trip.title.replace(/[^a-zA-Z0-9\u4e00-\u9fa5]/g, '-')}-${dateStr}.pdf`);
 }

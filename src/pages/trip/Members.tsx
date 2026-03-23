@@ -135,7 +135,7 @@ export const Members: React.FC = () => {
       )}
 
       <section>
-        <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+        <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
           旅伴列表
           <span
             style={{
@@ -154,7 +154,7 @@ export const Members: React.FC = () => {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {activeTrip.members.map(member => (
             <div key={member.id} className="member-card-row">
-              <span className="font-semibold text-xl flex-1 min-w-0" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <span className="font-semibold flex-1 min-w-0" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {member.nickname}
               </span>
               {!isArchived && (
