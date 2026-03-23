@@ -36,6 +36,11 @@ export const TripDetail: React.FC = () => {
           </Button>
           <h1 className="budgee-trip-title">
             {activeTrip.title}
+            {activeTrip.archived && (
+              <span style={{ fontSize: '0.55em', fontWeight: 500, marginLeft: 8, background: '#fef3c7', color: '#92400e', padding: '2px 10px', borderRadius: 12, verticalAlign: 'middle' }}>
+                已封存
+              </span>
+            )}
           </h1>
           <div className="min-w-\[80px\]" />
         </div>

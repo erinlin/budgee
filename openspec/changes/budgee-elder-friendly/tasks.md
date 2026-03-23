@@ -23,7 +23,7 @@
 - [x] 3.1 建立首頁（旅行列表）：卡片式列表、空狀態畫面、「新增旅行」按鈕
 - [x] 3.2 建立新增/編輯旅行表單（標題、描述、日期範圍、幣別）
 - [x] 3.3 實作 Dexie 旅行 CRUD（createTrip、updateTrip、deleteTrip）
-- [ ] 3.4 實作封存功能（setArchived）及封存後 UI 全面切換唯讀模式
+- [x] 3.4 實作封存功能（setArchived）及封存後 UI 全面切換唯讀模式
 
 ## 4. 成員管理（member-management）
 
@@ -35,10 +35,10 @@
 
 ## 5. 花費類型管理（expense-types）
 
-- [ ] 5.1 建立內建花費類型初始資料（住房 split、租車 split defaultAll、餐費 per-item、導覽費 split defaultAll、門票 per-item、高鐵/火車 per-item）
-- [ ] 5.2 建立花費類型管理頁面（顯示內建類型 + 自訂類型列表）
-- [ ] 5.3 實作自訂類型 CRUD（支援 split / per-item，per-item 可新增品項 options）
-- [ ] 5.4 刪除有花費紀錄的自訂類型時，顯示阻擋提示
+- [x] 5.1 建立內建花費類型初始資料（住房 split、租車 split defaultAll、餐費 per-item、導覽費 split defaultAll、門票 per-item、高鐵/火車 per-item）
+- [x] 5.2 建立花費類型管理頁面（顯示內建類型 + 自訂類型列表）
+- [x] 5.3 實作自訂類型 CRUD（支援 split / per-item，per-item 可新增品項 options）
+- [x] 5.4 刪除有花費紀錄的自訂類型時，顯示阻擋提示
 
 ## 6. 花費紀錄（expense-tracking）
 

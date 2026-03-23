@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { db } from '../db';
-import type { Trip, Member, Role } from '../types';
+import type { Trip, Member, Role, ExpenseType } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import { createDefaultExpenseTypes } from '../data/defaultExpenseTypes';
 
 interface TripState {
   trips: Trip[];
@@ -13,12 +14,18 @@ interface TripState {
   updateTrip: (id: string, updates: Partial<Trip>) => Promise<void>;
   deleteTrip: (id: string) => Promise<void>;
   setArchived: (id: string, archived: boolean) => Promise<void>;
-  
+
   // Member operations
   addMember: (tripId: string, nickname: string, role: Role) => Promise<void>;
   updateMember: (tripId: string, memberId: string, updates: Partial<Member>) => Promise<void>;
   deleteMember: (tripId: string, memberId: string) => Promise<void>;
   checkMemberHasExpenses: (tripId: string, memberId: string) => Promise<boolean>;
+
+  // ExpenseType operations
+  addExpenseType: (tripId: string, typeData: Omit<ExpenseType, 'id'>) => Promise<void>;
+  updateExpenseType: (tripId: string, typeId: string, updates: Partial<ExpenseType>) => Promise<void>;
+  deleteExpenseType: (tripId: string, typeId: string) => Promise<void>;
+  checkExpenseTypeHasExpenses: (tripId: string, typeId: string) => Promise<boolean>;
 }
 
 export const useTripStore = create<TripState>((set, get) => ({
@@ -50,6 +57,9 @@ export const useTripStore = create<TripState>((set, get) => ({
       ...tripData,
       id: uuidv4(),
       archived: false,
+      expenseTypes: tripData.expenseTypes.length > 0
+        ? tripData.expenseTypes
+        : createDefaultExpenseTypes(),
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
@@ -89,8 +99,7 @@ export const useTripStore = create<TripState>((set, get) => ({
     const trip = await db.trips.get(tripId);
     if (!trip) return;
     const newMember: Member = { id: uuidv4(), nickname, role };
-    const members = [...trip.members, newMember];
-    await get().updateTrip(tripId, { members });
+    await get().updateTrip(tripId, { members: [...trip.members, newMember] });
   },
 
   updateMember: async (tripId, memberId, updates) => {
@@ -105,21 +114,53 @@ export const useTripStore = create<TripState>((set, get) => ({
   deleteMember: async (tripId, memberId) => {
     const trip = await db.trips.get(tripId);
     if (!trip) return;
-    const members = trip.members.filter((m) => m.id !== memberId);
-    await get().updateTrip(tripId, { members });
+    await get().updateTrip(tripId, {
+      members: trip.members.filter((m) => m.id !== memberId),
+    });
   },
 
   checkMemberHasExpenses: async (tripId, memberId) => {
     const expenses = await db.expenses.where({ tripId }).toArray();
-    // check if this member is paidBy or in splits
     for (const exp of expenses) {
       if (exp.paidBy === memberId) return true;
       if (exp.splits.some((s) => s.memberId === memberId)) return true;
     }
     const collections = await db.collections.where({ tripId }).toArray();
-    for (const coll of collections) {
-      if (coll.memberId === memberId) return true;
-    }
-    return false;
+    return collections.some((c) => c.memberId === memberId);
+  },
+
+  // ExpenseType operations
+  addExpenseType: async (tripId, typeData) => {
+    const trip = await db.trips.get(tripId);
+    if (!trip) return;
+    const newType: ExpenseType = { ...typeData, id: uuidv4() };
+    await get().updateTrip(tripId, {
+      expenseTypes: [...trip.expenseTypes, newType],
+    });
+  },
+
+  updateExpenseType: async (tripId, typeId, updates) => {
+    const trip = await db.trips.get(tripId);
+    if (!trip) return;
+    const expenseTypes = trip.expenseTypes.map((t) =>
+      t.id === typeId ? { ...t, ...updates } : t
+    );
+    await get().updateTrip(tripId, { expenseTypes });
+  },
+
+  deleteExpenseType: async (tripId, typeId) => {
+    const trip = await db.trips.get(tripId);
+    if (!trip) return;
+    await get().updateTrip(tripId, {
+      expenseTypes: trip.expenseTypes.filter((t) => t.id !== typeId),
+    });
+  },
+
+  checkExpenseTypeHasExpenses: async (tripId, typeId) => {
+    const count = await db.expenses
+      .where({ tripId })
+      .filter((e) => e.typeId === typeId)
+      .count();
+    return count > 0;
   },
 }));

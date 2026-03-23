@@ -5,6 +5,8 @@ import { Home } from './pages/Home';
 import { TripEdit } from './pages/TripEdit';
 import { TripDetail } from './pages/trip/TripDetail';
 import { Members } from './pages/trip/Members';
+import { TripSettings } from './pages/trip/TripSettings';
+import { ExpenseTypes } from './pages/trip/ExpenseTypes';
 
 function App() {
   const { initialize } = useThemeStore();
@@ -25,7 +27,8 @@ function App() {
             <Route path="expenses" element={<div className="p-4">在此新增花費列表...</div>} />
             <Route path="collections" element={<div className="p-4">在此新增收款列表...</div>} />
             <Route path="members" element={<Members />} />
-            <Route path="settings" element={<div className="p-4">在此新增設定與封存...</div>} />
+            <Route path="settings" element={<TripSettings />} />
+            <Route path="expense-types" element={<ExpenseTypes />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
