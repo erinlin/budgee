@@ -24,7 +24,7 @@ export const TripDetail: React.FC = () => {
     { name: '花費', path: `/trip/${id}/expenses`, icon: Receipt },
     { name: '收款', path: `/trip/${id}/collections`, icon: Wallet },
     { name: '個人', path: `/trip/${id}/personal`, icon: User },
-    { name: '成員', path: `/trip/${id}/members`, icon: Users },
+    { name: '旅伴', path: `/trip/${id}/members`, icon: Users },
     { name: '設定', path: `/trip/${id}/settings`, icon: Settings },
   ];
 

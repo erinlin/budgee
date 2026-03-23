@@ -16,7 +16,7 @@ interface TripState {
   setArchived: (id: string, archived: boolean) => Promise<void>;
 
   // Member operations
-  addMember: (tripId: string, nickname: string, role: Role) => Promise<void>;
+  addMember: (tripId: string, nickname: string) => Promise<void>;
   updateMember: (tripId: string, memberId: string, updates: Partial<Member>) => Promise<void>;
   deleteMember: (tripId: string, memberId: string) => Promise<void>;
   checkMemberHasExpenses: (tripId: string, memberId: string) => Promise<boolean>;
@@ -95,10 +95,10 @@ export const useTripStore = create<TripState>((set, get) => ({
   },
 
   // Member operations
-  addMember: async (tripId, nickname, role) => {
+  addMember: async (tripId, nickname) => {
     const trip = await db.trips.get(tripId);
     if (!trip) return;
-    const newMember: Member = { id: uuidv4(), nickname, role };
+    const newMember: Member = { id: uuidv4(), nickname, role: 'member' };
     await get().updateTrip(tripId, { members: [...trip.members, newMember] });
   },
 

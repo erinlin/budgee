@@ -53,7 +53,7 @@ export const Personal: React.FC = () => {
       {/* 成員選擇器 */}
       <section>
         <label htmlFor="personal-member" className="budgee-label flex items-center gap-2">
-          <User size={20} /> 選擇成員
+          <User size={20} /> 選擇旅伴
         </label>
         <select
           id="personal-member"
@@ -122,7 +122,7 @@ export const Personal: React.FC = () => {
                         : null;
                       return (
                         <tr key={exp.id}>
-                          <td>{exp.date.replace(/-/g, '/')}</td>
+                          <td>{exp.date.slice(5).replace('-', '/')}</td>
                           <td>
                             <div>{exp.title || (exp.category === 'split' ? '分攤型' : '選項型')}</div>
                           </td>
@@ -156,7 +156,7 @@ export const Personal: React.FC = () => {
                     .filter(e => e.paidBy === selectedMemberId)
                     .map(exp => (
                       <tr key={exp.id}>
-                        <td>{exp.date.replace(/-/g, '/')}</td>
+                        <td>{exp.date.slice(5).replace('-', '/')}</td>
                         <td>
                           {exp.title || (exp.category === 'split' ? '分攤型' : '選項型')}
                         </td>
@@ -171,7 +171,7 @@ export const Personal: React.FC = () => {
 
           {/* 收款紀錄 */}
           <section>
-            <h2 className="section-title">收款紀錄</h2>
+            <h2 className="section-title">付款紀錄</h2>
             {collections.length === 0 ? (
               <p style={{ color: 'var(--text-muted)' }}>無收款紀錄</p>
             ) : (
@@ -199,7 +199,7 @@ export const Personal: React.FC = () => {
       {trip.members.length === 0 && (
         <div className="empty-state">
           <User size={48} strokeWidth={1.5} />
-          <p>尚未新增任何成員</p>
+          <p>尚未新增任何旅伴</p>
         </div>
       )}
     </div>

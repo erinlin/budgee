@@ -44,7 +44,7 @@ export const Collections: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
-    if (!memberId) { setFormError('請選擇成員'); return; }
+    if (!memberId) { setFormError('請選擇旅伴'); return; }
     const amt = parseFloat(amount);
     if (isNaN(amt) || amt <= 0) { setFormError('請輸入有效金額'); return; }
 
@@ -70,7 +70,7 @@ export const Collections: React.FC = () => {
       <section>
         <h2 className="section-title">每人餘額</h2>
         {trip.members.length === 0 ? (
-          <p style={{ color: 'var(--text-muted)' }}>尚未新增成員</p>
+          <p style={{ color: 'var(--text-muted)' }}>尚未新增旅伴</p>
         ) : (
           <div className="balance-table-wrap">
             <table className="budgee-table">
@@ -140,7 +140,7 @@ export const Collections: React.FC = () => {
                   }}
                   className="budgee-input cursor-pointer"
                 >
-                  <option value="">請選擇成員</option>
+                  <option value="">請選擇旅伴</option>
                   {trip.members.map(m => (
                     <option key={m.id} value={m.id}>{m.nickname}</option>
                   ))}

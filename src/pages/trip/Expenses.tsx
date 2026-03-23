@@ -17,7 +17,7 @@ import { ExpenseForm, type ExpenseFormData } from '../../components/expenses/Exp
 import { fmt } from '../../utils/fmt';
 import { Plus, Trash2, Edit2, ChevronDown, ChevronUp, Receipt } from 'lucide-react';
 
-const formatDate = (d: string) => d.replace(/-/g, '/');
+const formatDate = (d: string) => d.slice(5).replace('-', '/');
 
 function getMemberName(trip: Trip, memberId: string | null): string {
   if (!memberId) return '無代墊';
@@ -58,15 +58,6 @@ export const Expenses: React.FC = () => {
       accessorKey: 'date',
       header: '日期',
       cell: ({ getValue }) => formatDate(getValue<string>()),
-    },
-    {
-      accessorKey: 'category',
-      header: '類型',
-      cell: ({ getValue }) => (
-        <span className={`badge-category ${getValue<string>()}`}>
-          {getValue<string>() === 'split' ? '分攤型' : '選項型'}
-        </span>
-      ),
     },
     {
       accessorKey: 'title',

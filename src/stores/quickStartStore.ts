@@ -19,10 +19,9 @@ export const useQuickStartStore = create<QuickStartState>((set, get) => ({
   memberNicknames: getMemberCache(),
   addMemberNickname: (nickname: string) => {
     const current = get().memberNicknames;
-    if (!current.includes(nickname)) {
-      const updated = [...current, nickname];
-      localStorage.setItem('budgee_member_cache', JSON.stringify(updated));
-      set({ memberNicknames: updated });
-    }
+    const filtered = current.filter(n => n !== nickname);
+    const updated = [...filtered, nickname].slice(-30);
+    localStorage.setItem('budgee_member_cache', JSON.stringify(updated));
+    set({ memberNicknames: updated });
   },
 }));

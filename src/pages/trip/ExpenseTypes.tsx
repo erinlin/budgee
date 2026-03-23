@@ -210,13 +210,13 @@ export const ExpenseTypes: React.FC = () => {
           {builtInTypes.map((type) => (
             <div key={type.id} className="member-card-row">
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                   <span className="font-semibold text-xl">{type.name}</span>
                   <span className="budgee-badge badge-secondary" style={{ fontSize: '0.75em' }}>內建</span>
-                </div>
-                <div style={{ color: 'var(--text-muted)', fontSize: '0.9em' }}>
-                  {CATEGORY_LABELS[type.category]}
-                  {type.defaultAll && '・預設全員'}
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.9em' }}>
+                    {CATEGORY_LABELS[type.category]}
+                    {type.defaultAll && '・預設全員'}
+                  </span>
                 </div>
                 {type.options && type.options.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
@@ -268,11 +268,9 @@ export const ExpenseTypes: React.FC = () => {
             ) : (
               <div key={type.id} className="member-card-row">
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="font-semibold text-xl" style={{ marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {type.name}
-                  </div>
-                  <div style={{ color: 'var(--text-muted)', fontSize: '0.9em' }}>
-                    {CATEGORY_LABELS[type.category]}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                    <span className="font-semibold text-xl">{type.name}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.9em' }}>{CATEGORY_LABELS[type.category]}</span>
                   </div>
                   {type.options && type.options.length > 0 && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
