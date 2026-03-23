@@ -1,28 +1,28 @@
 ## 1. 專案初始化
 
-- [ ] 1.1 使用 `create-vite` 建立 React + TypeScript 專案，設定目錄結構（components / pages / stores / db / types）
-- [ ] 1.2 安裝核心依賴：dexie、zustand、react-router-dom、@tanstack/react-table
-- [ ] 1.3 安裝匯出依賴：jspdf、jspdf-autotable（PDF）
-- [ ] 1.4 安裝 PWA 插件：vite-plugin-pwa，設定 Service Worker 與 manifest
-- [ ] 1.5 建立 TypeScript 型別定義（Trip、Member、ExpenseType、Expense、Split、Collection）
-- [ ] 1.6 初始化 Dexie 資料庫 schema（trips、expenses、collections 資料表）
+- [x] 1.1 使用 `create-vite` 建立 React + TypeScript 專案，設定目錄結構（components / pages / stores / db / types）
+- [x] 1.2 安裝核心依賴：dexie、zustand、react-router-dom、@tanstack/react-table
+- [x] 1.3 安裝匯出依賴：jspdf、jspdf-autotable（PDF）
+- [x] 1.4 安裝 PWA 插件：vite-plugin-pwa，設定 Service Worker 與 manifest
+- [x] 1.5 建立 TypeScript 型別定義（Trip、Member、ExpenseType、Expense、Split、Collection）
+- [x] 1.6 初始化 Dexie 資料庫 schema（trips、expenses、collections 資料表）
 
 ## 2. UI 設計系統（老年友好）
 
-- [ ] 2.1 建立 CSS 全域設計 token（字體大小、行距、顏色語意、間距、圓角）
-- [ ] 2.2 設定深色模式（`prefers-color-scheme` + 手動切換，儲存至 localStorage）
-- [ ] 2.3 建立基礎元件：Button（最小 48×48px）、Input（最小高度 48px）、Label
-- [ ] 2.4 建立 ConfirmDialog 元件（重要操作的二次確認，支援無障礙）
-- [ ] 2.5 建立 Table 元件（基於 TanStack Table，支援排序，老年友好行距）
-- [ ] 2.6 建立 Badge 元件（角色標籤：主辦人 / 會計 / 一般成員）
-- [ ] 2.7 建立 AmountDisplay 元件（正值顯示紅色系、負值顯示綠色系）
-- [ ] 2.8 確認所有文字對比度符合 WCAG AA 標準（≥ 4.5:1）
+- [x] 2.1 建立 CSS 全域設計 token（字體大小、行距、顏色語意、間距、圓角）
+- [x] 2.2 設定深色模式（`prefers-color-scheme` + 手動切換，儲存至 localStorage）
+- [x] 2.3 建立基礎元件：Button（最小 48×48px）、Input（最小高度 48px）、Label
+- [x] 2.4 建立 ConfirmDialog 元件（重要操作的二次確認，支援無障礙）
+- [x] 2.5 建立 Table 元件（基於 TanStack Table，支援排序，老年友好行距）
+- [x] 2.6 建立 Badge 元件（角色標籤：主辦人 / 會計 / 一般成員）
+- [x] 2.7 建立 AmountDisplay 元件（正值顯示紅色系、負值顯示綠色系）
+- [x] 2.8 確認所有文字對比度符合 WCAG AA 標準（≥ 4.5:1）
 
 ## 3. 旅行管理（trip-management）
 
-- [ ] 3.1 建立首頁（旅行列表）：卡片式列表、空狀態畫面、「新增旅行」按鈕
-- [ ] 3.2 建立新增/編輯旅行表單（標題、描述、日期範圍、幣別）
-- [ ] 3.3 實作 Dexie 旅行 CRUD（createTrip、updateTrip、deleteTrip）
+- [x] 3.1 建立首頁（旅行列表）：卡片式列表、空狀態畫面、「新增旅行」按鈕
+- [x] 3.2 建立新增/編輯旅行表單（標題、描述、日期範圍、幣別）
+- [x] 3.3 實作 Dexie 旅行 CRUD（createTrip、updateTrip、deleteTrip）
 - [ ] 3.4 實作封存功能（setArchived）及封存後 UI 全面切換唯讀模式
 
 ## 4. 成員管理（member-management）

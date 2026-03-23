@@ -1,111 +1,276 @@
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* Colors - Light Theme */
+  --bg-main: #ffffff;
+  --bg-card: #f8f9fa;
+  --text-main: #1a1a1a;
+  --text-muted: #4b5563;
+  --border-color: #e5e7eb;
+  
+  /* Semantic Colors */
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-danger: #dc2626; /* Red for alerts, owed amount */
+  --color-success: #16a34a; /* Green for cleared, refund amount */
+  --color-neutral: #6b7280;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  /* Typography */
+  --font-sans: system-ui, -apple-system, sans-serif;
+  --font-size-base: 18px; /* Elder friendly */
+  --font-size-lg: 20px;
+  --font-size-h1: 32px;
+  --font-size-h2: 26px;
+  --line-height-base: 1.6;
+  
+  /* Accessibility & Usability */
+  --touch-target: 48px;
+  
+  /* Spacing */
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  
+  /* Borders */
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--text-main);
+  background-color: var(--bg-main);
+  color-scheme: light;
 }
 
+/* Dark Mode Variables - Manual Toggle */
+:root.dark {
+  --bg-main: #111827;
+  --bg-card: #1f2937;
+  --text-main: #f9fafb;
+  --text-muted: #9ca3af;
+  --border-color: #374151;
+  
+  /* Semantic Colors in dark mode */
+  --color-primary: #3b82f6;
+  --color-primary-hover: #60a5fa;
+  --color-danger: #ef4444;
+  --color-success: #22c55e;
+  
+  color-scheme: dark;
+}
+
+/* Dark Mode Variables - System Preference */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+  :root:not(.light) {
+    --bg-main: #111827;
+    --bg-card: #1f2937;
+    --text-main: #f9fafb;
+    --text-muted: #9ca3af;
+    --border-color: #374151;
+    
+    /* Semantic Colors in dark mode */
+    --color-primary: #3b82f6;
+    --color-primary-hover: #60a5fa;
+    --color-danger: #ef4444;
+    --color-success: #22c55e;
+    
+    color-scheme: dark;
   }
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
+/* Base Resets */
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
 
-code,
-.counter {
-  font-family: var(--mono);
+/* Utility Classes */
+.text-danger { color: var(--color-danger); }
+.text-success { color: var(--color-success); }
+.text-muted { color: var(--text-muted); }
+
+/* Button Styles */
+.budgee-btn {
   display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+  align-items: center;
+  justify-center: center;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  min-height: 48px;
+  min-width: 48px;
+  padding: 0 1.5rem;
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+.budgee-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+.btn-secondary {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--border-color);
+}
+.btn-danger {
+  background-color: var(--color-danger);
+  color: white;
+}
+.btn-ghost {
+  background-color: transparent;
+  color: var(--color-primary);
+}
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--bg-card);
+}
+.w-full {
+  width: 100%;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* Forms */
+.budgee-input {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-main);
+  color: var(--text-main);
+  padding: 0 var(--spacing-md);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  transition: border-color 0.2s;
 }
+.budgee-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-hover);
+}
+.input-error {
+  border-color: var(--color-danger);
+}
+
+.budgee-label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+/* Badges */
+.budgee-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: var(--radius-md);
+  font-size: 0.8em;
+  font-weight: 500;
+}
+.badge-primary {
+  background: var(--color-primary);
+  color: white;
+}
+.badge-secondary {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+.badge-default {
+  background: var(--border-color);
+  color: var(--text-muted);
+}
+
+/* Dialogs */
+.budgee-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+  padding: var(--spacing-md);
+  z-index: 50;
+}
+.budgee-dialog {
+  background: var(--bg-main);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+.budgee-dialog h2 {
+  font-size: var(--font-size-h2);
+  margin-top: 0;
+}
+.budgee-dialog p {
+  color: var(--text-muted);
+  margin-bottom: var(--spacing-lg);
+}
+.budgee-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-md);
+}
+
+/* Tables */
+.budgee-table-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-main);
+}
+.budgee-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+.budgee-table th,
+.budgee-table td {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+}
+.budgee-table th {
+  background: var(--bg-card);
+  font-weight: 600;
+  user-select: none;
+}
+.budgee-table tr.clickable-row {
+  cursor: pointer;
+}
+.budgee-table tr.clickable-row:hover {
+  background: var(--bg-card);
+}
+
+
+
