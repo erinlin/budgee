@@ -1,0 +1,15 @@
+schema: spec-driven
+
+context: |
+  Project: Budgee - 旅行團體個人預算計算 App
+  Tech stack: React 18, Vite 5, TypeScript 5, Dexie.js (IndexedDB), Zustand, React Router, TanStack Table
+  PWA: vite-plugin-pwa (offline-first)
+  Export: jsPDF + jsPDF-AutoTable (PDF), File API (JSON)
+  UI: Vanilla CSS, elder-friendly design (min font 18px, contrast WCAG AA, touch target 48px)
+  Language: Traditional Chinese (Taiwan)
+  No backend - all data stored in browser IndexedDB
+  Conventions:
+    - Use uuid for all entity IDs
+    - Commit messages in English (feat/fix/refactor/docs/remove)
+    - No emoji in code or commits
+    - Taiwan Traditional Chinese only (not Simplified)
