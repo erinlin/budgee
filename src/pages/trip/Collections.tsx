@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTripStore } from '../../stores/tripStore';
 import { useCollectionStore, type MemberBalance } from '../../stores/collectionStore';
+import type { CollectionType } from '../../types';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Label } from '../../components/ui/Label';
@@ -20,6 +21,7 @@ export const Collections: React.FC = () => {
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   // Form state
+  const [collType, setCollType] = useState<CollectionType>('collect');
   const [memberId, setMemberId] = useState('');
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
@@ -50,7 +52,7 @@ export const Collections: React.FC = () => {
 
     try {
       setSubmitting(true);
-      await addCollection({ tripId: id, memberId, amount: amt, type: 'collect', note });
+      await addCollection({ tripId: id, memberId, amount: amt, type: collType, note });
       setMemberId('');
       setAmount('');
       setNote('');
@@ -89,7 +91,7 @@ export const Collections: React.FC = () => {
                     <td className="font-semibold">{getMemberName(b.memberId)}</td>
                     <td className="text-right">{fmt(b.splitTotal)}</td>
                     <td className="text-right">{fmt(b.paidTotal)}</td>
-                    <td className="text-right">{fmt(b.collectedTotal)}</td>
+                    <td className="text-right">{fmt(b.displayCollected)}</td>
                     <td className="text-right">
                       <AmountDisplay amount={b.balance} />
                     </td>
@@ -131,11 +133,17 @@ export const Collections: React.FC = () => {
                       const b = balances.find(b => b.memberId === selected);
                       if (b && b.balance > 0) {
                         setAmount(String(Math.round(b.balance)));
+                        setCollType('collect');
+                      } else if (b && b.balance < 0) {
+                        setAmount(String(Math.round(Math.abs(b.balance))));
+                        setCollType('payout');
                       } else {
                         setAmount('');
+                        setCollType('collect');
                       }
                     } else {
                       setAmount('');
+                      setCollType('collect');
                     }
                   }}
                   className="budgee-input cursor-pointer"
@@ -159,6 +167,12 @@ export const Collections: React.FC = () => {
                 />
               </div>
             </div>
+
+            {memberId && (
+              <p className="text-sm font-medium" style={{ color: collType === 'payout' ? 'var(--color-success)' : 'var(--color-primary)' }}>
+                類型：{collType === 'payout' ? '退款給代墊人' : '收款（應繳）'}
+              </p>
+            )}
 
             <div>
               <Label htmlFor="coll-note">備註</Label>
@@ -213,6 +227,9 @@ export const Collections: React.FC = () => {
                     <td className="font-semibold">{getMemberName(c.memberId)}</td>
                     <td className="text-right">
                       <span style={{ fontWeight: 600 }}>{fmt(c.amount)}</span>
+                      {c.type === 'payout' && (
+                        <span className="ml-1 text-xs px-1 rounded" style={{ background: 'var(--color-success)', color: '#fff' }}>退款</span>
+                      )}
                     </td>
                     <td style={{ color: 'var(--text-muted)' }}>{c.note || '—'}</td>
                     {!isArchived && (

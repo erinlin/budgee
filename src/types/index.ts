@@ -55,7 +55,7 @@ export interface Expense {
   splits: Split[];
 }
 
-export type CollectionType = "pre-collect" | "collect";
+export type CollectionType = "pre-collect" | "collect" | "payout";
 
 export interface Collection {
   id: string;

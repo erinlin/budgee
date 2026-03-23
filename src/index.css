@@ -148,6 +148,10 @@ select.budgee-input {
   appearance: none;
   max-width: 100%;
   overflow: hidden;
+  height: 48px;
+  line-height: 48px;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 select.budgee-input {
   height: 48px;
