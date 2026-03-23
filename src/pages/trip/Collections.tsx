@@ -109,10 +109,10 @@ export const Collections: React.FC = () => {
       {/* 收款紀錄 */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="section-title">收款紀錄</h2>
+          <h2 className="section-title">收/退款紀錄</h2>
           {!isArchived && (
             <Button variant="primary" onClick={() => setShowForm(!showForm)}>
-              <Plus size={20} /> 新增收款
+              <Plus size={20} />新增
             </Button>
           )}
         </div>
@@ -134,16 +134,20 @@ export const Collections: React.FC = () => {
                       if (b && b.balance > 0) {
                         setAmount(String(Math.round(b.balance)));
                         setCollType('collect');
+                        setNote('');
                       } else if (b && b.balance < 0) {
                         setAmount(String(Math.round(Math.abs(b.balance))));
                         setCollType('payout');
+                        setNote('退款');
                       } else {
                         setAmount('');
                         setCollType('collect');
+                        setNote('');
                       }
                     } else {
                       setAmount('');
                       setCollType('collect');
+                      setNote('');
                     }
                   }}
                   className="budgee-input cursor-pointer"
@@ -226,10 +230,7 @@ export const Collections: React.FC = () => {
                   <tr key={c.id}>
                     <td className="font-semibold">{getMemberName(c.memberId)}</td>
                     <td className="text-right">
-                      <span style={{ fontWeight: 600 }}>{fmt(c.amount)}</span>
-                      {c.type === 'payout' && (
-                        <span className="ml-1 text-xs px-1 rounded" style={{ background: 'var(--color-success)', color: '#fff' }}>退款</span>
-                      )}
+                      <span style={{ fontWeight: 600, color: c.type === 'payout' ? 'var(--color-warning, #f97316)' : undefined }}>{fmt(c.amount)}</span>
                     </td>
                     <td style={{ color: 'var(--text-muted)' }}>{c.note || '—'}</td>
                     {!isArchived && (

@@ -11,7 +11,7 @@ function calcBalances(
   trip: Trip,
   expenses: Expense[],
   collections: Collection[]
-): Array<{ name: string; splitTotal: number; paidTotal: number; collectedTotal: number; balance: number }> {
+): Array<{ name: string; splitTotal: number; paidTotal: number; displayCollected: number; balance: number }> {
   return trip.members.map(member => {
     const splitTotal = expenses.reduce((sum, exp) => {
       const split = exp.splits.find(s => s.memberId === member.id);
@@ -22,13 +22,25 @@ function calcBalances(
       return exp.paidBy === member.id ? sum + exp.totalAmount : sum;
     }, 0);
 
-    const collectedTotal = collections
-      .filter(c => c.memberId === member.id)
+    const selfPaidTotal = expenses.reduce((sum, exp) => {
+      if (exp.paidBy !== member.id) return sum;
+      const split = exp.splits.find(s => s.memberId === member.id);
+      return sum + (split?.amount ?? 0);
+    }, 0);
+
+    const collectOnlyTotal = collections
+      .filter(c => c.memberId === member.id && c.type !== 'payout')
       .reduce((sum, c) => sum + c.amount, 0);
 
+    const payoutTotal = collections
+      .filter(c => c.memberId === member.id && c.type === 'payout')
+      .reduce((sum, c) => sum + c.amount, 0);
+
+    const collectedTotal = collectOnlyTotal - payoutTotal;
+    const displayCollected = selfPaidTotal + collectOnlyTotal;
     const balance = splitTotal - paidTotal - collectedTotal;
 
-    return { name: member.nickname, splitTotal, paidTotal, collectedTotal, balance };
+    return { name: member.nickname, splitTotal, paidTotal, displayCollected, balance };
   });
 }
 
@@ -65,7 +77,7 @@ export async function exportTripAsPdf(tripId: string): Promise<void> {
         <td>${b.name}</td>
         <td class="num">${fmt(b.splitTotal)}</td>
         <td class="num">${fmt(b.paidTotal)}</td>
-        <td class="num">${fmt(b.collectedTotal)}</td>
+        <td class="num">${fmt(b.displayCollected)}</td>
         <td class="num ${balanceClass}">${fmt(Math.abs(b.balance))}（${balanceLabel}）</td>
       </tr>`;
   }).join('');

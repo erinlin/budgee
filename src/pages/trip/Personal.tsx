@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTripStore } from '../../stores/tripStore';
-import { useCollectionStore } from '../../stores/collectionStore';
+import { useCollectionStore, type MemberBalance } from '../../stores/collectionStore';
 import { db } from '../../db';
 import type { Expense, Collection } from '../../types';
 import { AmountDisplay } from '../../components/ui/AmountDisplay';
@@ -16,7 +16,7 @@ export const Personal: React.FC = () => {
   const [selectedMemberId, setSelectedMemberId] = useState('');
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
-  const [balance, setBalance] = useState<{ splitTotal: number; paidTotal: number; collectedTotal: number; balance: number } | null>(null);
+  const [balance, setBalance] = useState<MemberBalance | null>(null);
 
   useEffect(() => {
     if (activeTrip && activeTrip.members.length > 0 && !selectedMemberId) {
@@ -185,7 +185,9 @@ export const Personal: React.FC = () => {
                 <tbody>
                   {collections.map(c => (
                     <tr key={c.id}>
-                      <td className="font-semibold text-right">{fmt(c.amount)}</td>
+                      <td className="font-semibold text-right" style={{ color: c.type === 'payout' ? 'var(--color-warning, #f97316)' : undefined }}>
+                        {fmt(c.amount)}
+                      </td>
                       <td style={{ color: 'var(--text-muted)' }}>{c.note || '—'}</td>
                     </tr>
                   ))}
