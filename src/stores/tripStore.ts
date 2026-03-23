@@ -156,11 +156,8 @@ export const useTripStore = create<TripState>((set, get) => ({
     });
   },
 
-  checkExpenseTypeHasExpenses: async (tripId, typeId) => {
-    const count = await db.expenses
-      .where({ tripId })
-      .filter((e) => e.typeId === typeId)
-      .count();
-    return count > 0;
+  checkExpenseTypeHasExpenses: async (_tripId, _typeId) => {
+    // 花費類型現在作為預設範本使用，不再與個別花費直接綁定
+    return false;
   },
 }));

@@ -45,7 +45,6 @@ export function createDefaultExpenseTypes(): ExpenseType[] {
       options: [
         { id: uuidv4(), label: '全票', price: 0 },
         { id: uuidv4(), label: '敬老票', price: 0 },
-        { id: uuidv4(), label: '志工', price: 0 },
       ],
     },
     {

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useParams, useNavigate, Outlet, Link, useLocation } from 'react-router-dom';
 import { useTripStore } from '../../stores/tripStore';
 import { Button } from '../../components/ui/Button';
-import { ArrowLeft, Settings, Users, Receipt, Wallet } from 'lucide-react';
+import { ArrowLeft, Settings, Users, Receipt, Wallet, User } from 'lucide-react';
 
 export const TripDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +23,7 @@ export const TripDetail: React.FC = () => {
   const tabs = [
     { name: '花費', path: `/trip/${id}/expenses`, icon: Receipt },
     { name: '收款', path: `/trip/${id}/collections`, icon: Wallet },
+    { name: '個人', path: `/trip/${id}/personal`, icon: User },
     { name: '成員', path: `/trip/${id}/members`, icon: Users },
     { name: '設定', path: `/trip/${id}/settings`, icon: Settings },
   ];

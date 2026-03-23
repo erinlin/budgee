@@ -7,6 +7,9 @@ import { TripDetail } from './pages/trip/TripDetail';
 import { Members } from './pages/trip/Members';
 import { TripSettings } from './pages/trip/TripSettings';
 import { ExpenseTypes } from './pages/trip/ExpenseTypes';
+import { Expenses } from './pages/trip/Expenses';
+import { Collections } from './pages/trip/Collections';
+import { Personal } from './pages/trip/Personal';
 
 function App() {
   const { initialize } = useThemeStore();
@@ -24,8 +27,9 @@ function App() {
           <Route path="/trip/:id/edit" element={<TripEdit />} />
           <Route path="/trip/:id" element={<TripDetail />}>
             <Route index element={<Navigate to="expenses" replace />} />
-            <Route path="expenses" element={<div className="p-4">在此新增花費列表...</div>} />
-            <Route path="collections" element={<div className="p-4">在此新增收款列表...</div>} />
+            <Route path="expenses" element={<Expenses />} />
+            <Route path="collections" element={<Collections />} />
+            <Route path="personal" element={<Personal />} />
             <Route path="members" element={<Members />} />
             <Route path="settings" element={<TripSettings />} />
             <Route path="expense-types" element={<ExpenseTypes />} />

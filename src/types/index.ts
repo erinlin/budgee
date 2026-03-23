@@ -45,12 +45,13 @@ export interface Split {
 
 export interface Expense {
   id: string;
-  tripId: string; // Foreign key
-  typeId: string;
+  tripId: string;
+  category: 'split' | 'per-item';
   title: string;
   date: string; // YYYY-MM-DD
   totalAmount: number;
   paidBy: string | null; // memberId
+  options?: ExpenseOption[]; // per-item 模式的內嵌選項定義
   splits: Split[];
 }
 

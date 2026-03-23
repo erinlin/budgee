@@ -2,14 +2,44 @@ schema: spec-driven
 
 context: |
   Project: Budgee - 旅行團體個人預算計算 App
-  Tech stack: React 18, Vite 5, TypeScript 5, Dexie.js (IndexedDB), Zustand, React Router, TanStack Table
-  PWA: vite-plugin-pwa (offline-first)
-  Export: jsPDF + jsPDF-AutoTable (PDF), File API (JSON)
-  UI: Vanilla CSS, elder-friendly design (min font 18px, contrast WCAG AA, touch target 48px)
+  Tech stack: React 18, Vite 5, TypeScript 5, Dexie.js (IndexedDB), Zustand, React Router v7, TanStack Table v8
+  PWA: vite-plugin-pwa v1 + Workbox (CacheFirst strategy, offline-first)
+  Export: jsPDF v4 + jsPDF-AutoTable (PDF), File API + Blob (JSON)
+  UI: Vanilla CSS (index.css), elder-friendly design (min font 18px, contrast WCAG AA, touch target 48px)
+  Icons: lucide-react
   Language: Traditional Chinese (Taiwan)
   No backend - all data stored in browser IndexedDB
+
+  Directory structure:
+    src/
+      pages/      - Page-level components (Home, TripEdit, trip/*)
+      components/ - Reusable UI components (ui/*, expenses/*)
+      stores/     - Zustand stores (tripStore, expenseStore, collectionStore, themeStore, quickStartStore)
+      db/         - Dexie database instance
+      types/      - TypeScript type definitions
+      utils/      - Utility functions (exportImport, pdfExport)
+      data/       - Static data (defaultExpenseTypes)
+
+  Key stores:
+    - tripStore: Trip CRUD, member management, expense type management
+    - expenseStore: Expense CRUD + split/per-item calculation utilities
+    - collectionStore: Collection CRUD + member balance calculation
+    - themeStore: Light/dark/system theme toggle (localStorage)
+    - quickStartStore: Member nickname cache (localStorage)
+
+  Expense categories:
+    - split: fixed total divided among selected members
+    - per-item: each member picks an option with individual price
+    - general: same as split (single total, member selection)
+
+  Balance formula:
+    balance = splitTotal - paidTotal - collectedTotal
+    positive = owes money (red), negative = to be refunded (green)
+
   Conventions:
     - Use uuid for all entity IDs
     - Commit messages in English (feat/fix/refactor/docs/remove)
     - No emoji in code or commits
     - Taiwan Traditional Chinese only (not Simplified)
+    - CSS classes use kebab-case with budgee- prefix for component-level
+    - Tailwind-like utility classes in index.css (flex, gap-*, space-y-*, etc.)

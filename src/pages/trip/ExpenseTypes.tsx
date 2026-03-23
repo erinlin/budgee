@@ -7,6 +7,7 @@ import { Input } from '../../components/ui/Input';
 import { Label } from '../../components/ui/Label';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import type { ExpenseCategory, ExpenseOption } from '../../types';
+import { fmt } from '../../utils/fmt';
 import { Plus, Trash2, Edit2, ArrowLeft, X } from 'lucide-react';
 
 interface TypeFormData {
@@ -68,11 +69,12 @@ export const ExpenseTypes: React.FC = () => {
     }
     setFormError('');
 
+    const editingType = editingId ? activeTrip.expenseTypes.find(t => t.id === editingId) : null;
     const typeData = {
       name: formData.name.trim(),
       category: formData.category,
-      defaultAll: false,
-      builtIn: false as const,
+      defaultAll: editingType?.defaultAll ?? false,
+      builtIn: editingType?.builtIn ?? false,
       options: formData.category !== 'split' && formData.options.length > 0
         ? formData.options
         : undefined,
@@ -82,7 +84,7 @@ export const ExpenseTypes: React.FC = () => {
       await updateExpenseType(id, editingId, typeData);
       setEditingId(null);
     } else {
-      await addExpenseType(id, typeData);
+      await addExpenseType(id, { ...typeData, builtIn: false });
       setShowAddForm(false);
     }
     setFormData(emptyForm());
@@ -220,12 +222,21 @@ export const ExpenseTypes: React.FC = () => {
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>
                     {type.options.map((opt) => (
                       <span key={opt.id} className="budgee-badge badge-default" style={{ fontSize: '0.8em' }}>
-                        {opt.label}
+                        {opt.label}{opt.price > 0 ? ` ${fmt(opt.price)}` : ''}
                       </span>
                     ))}
                   </div>
                 )}
               </div>
+              {!isArchived && editingId !== type.id && (
+                <button
+                  className="icon-btn"
+                  onClick={() => handleEditClick(type.id)}
+                  aria-label={`編輯 ${type.name}`}
+                >
+                  <Edit2 size={18} />
+                </button>
+              )}
             </div>
           ))}
         </div>

@@ -17,7 +17,7 @@ export const TripEdit: React.FC = () => {
     description: '',
     startDate: new Date().toISOString().split('T')[0],
     endDate: new Date().toISOString().split('T')[0],
-    currency: 'TWD',
+    currency: '',
   });
 
   const [error, setError] = useState('');
@@ -115,16 +115,6 @@ export const TripEdit: React.FC = () => {
               onChange={(e) => setForm({ ...form, endDate: e.target.value })}
             />
           </div>
-        </div>
-
-        <div>
-          <Label htmlFor="currency">幣別</Label>
-          <Input
-            id="currency"
-            value={form.currency}
-            onChange={(e) => setForm({ ...form, currency: e.target.value })}
-            placeholder="TWD"
-          />
         </div>
 
         <div className="pt-4 flex gap-4">
