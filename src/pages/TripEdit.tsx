@@ -41,7 +41,15 @@ export const TripEdit: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.title.trim()) {
-      setError('標題為必填項目');
+      setError('請填寫旅行標題');
+      return;
+    }
+    if (!form.startDate) {
+      setError('請選擇開始日期');
+      return;
+    }
+    if (!form.endDate) {
+      setError('請選擇結束日期');
       return;
     }
     setError('');
@@ -68,9 +76,9 @@ export const TripEdit: React.FC = () => {
     <div className="max-w-2xl mx-auto p-4 budgee-page">
       <header className="flex items-center gap-4 mb-8">
         <Button variant="ghost" onClick={() => navigate(-1)} className="px-2">
-          <ArrowLeft size={24} /> 返回
+          <ArrowLeft size={24} />
         </Button>
-        <h1 className="m-0 text-3xl">{isEditing ? '編輯旅行' : '新增旅行'}</h1>
+        <h1 className="text-3xl">{isEditing ? '編輯旅行' : '新增旅行'}</h1>
       </header>
 
       <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
@@ -98,20 +106,28 @@ export const TripEdit: React.FC = () => {
 
         <div className="flex gap-4 flex-col sm:flex-row">
           <div className="flex-1">
-            <Label htmlFor="startDate">開始日期</Label>
+            <Label htmlFor="startDate">開始日期 <span className="text-red-500">*</span></Label>
             <Input
               id="startDate"
               type="date"
               value={form.startDate}
-              onChange={(e) => setForm({ ...form, startDate: e.target.value })}
+              onChange={(e) => {
+                const newStart = e.target.value;
+                setForm({
+                  ...form,
+                  startDate: newStart,
+                  endDate: form.endDate && form.endDate < newStart ? newStart : form.endDate,
+                });
+              }}
             />
           </div>
           <div className="flex-1">
-            <Label htmlFor="endDate">結束日期</Label>
+            <Label htmlFor="endDate">結束日期 <span className="text-red-500">*</span></Label>
             <Input
               id="endDate"
               type="date"
               value={form.endDate}
+              min={form.startDate || undefined}
               onChange={(e) => setForm({ ...form, endDate: e.target.value })}
             />
           </div>

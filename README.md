@@ -1,73 +1,43 @@
-# React + TypeScript + Vite
+# Budgee
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+旅行團體費用分攤管理工具，專為長者友善設計。支援離線使用，資料儲存於本機瀏覽器。
 
-Currently, two official plugins are available:
+## 功能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **旅程管理** - 建立多個旅程，支援封存
+- **旅伴管理** - 新增旅伴，常用旅伴快速選取
+- **花費紀錄** - 分攤型（均攤）與選項型（各選品項）兩種模式
+- **收款管理** - 記錄收款，自動計算每人餘額
+- **個人明細** - 查看單一旅伴的分攤、代墊、付款紀錄
+- **匯出** - JSON 備份、PDF 列印報表
+- **PWA** - 可安裝至手機主畫面，支援離線使用
 
-## React Compiler
+## 技術棧
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| 類別 | 技術 |
+|------|------|
+| 前端框架 | React 18 + TypeScript |
+| 建置工具 | Vite |
+| 本地資料庫 | Dexie.js（IndexedDB） |
+| 狀態管理 | Zustand |
+| 表格 | TanStack Table v8 |
+| PWA | vite-plugin-pwa + Workbox |
+| 樣式 | CSS 變數 + Tailwind utility |
 
-## Expanding the ESLint configuration
+## 本地開發
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## 部署
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
+# dist/ 資料夾上傳至靜態托管服務（Vercel / Netlify）
 ```
+
+## 資料儲存
+
+所有資料存於使用者瀏覽器的 IndexedDB，不上傳至任何伺服器。清除瀏覽器資料會一併清除旅程紀錄，建議定期使用 JSON 匯出備份。

@@ -13,7 +13,7 @@ export default defineConfig({
         name: 'Budgee 旅行預算管理',
         short_name: 'Budgee',
         description: '離線優先的旅行團體預算管理工具',
-        theme_color: '#2563eb',
+        theme_color: '#4d8c0a',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
@@ -35,11 +35,35 @@ export default defineConfig({
             type: 'image/svg+xml',
             purpose: 'maskable',
           },
+          {
+            src: 'apple-touch-icon.png',
+            sizes: '1024x1024',
+            type: 'image/png',
+          },
         ],
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        navigateFallback: 'index.html',
         runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.mode === 'navigate',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'pages-cache',
+              networkTimeoutSeconds: 3,
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            urlPattern: /\.(?:js|css|svg|png|ico|woff2)$/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'assets-cache',
+              networkTimeoutSeconds: 3,
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',

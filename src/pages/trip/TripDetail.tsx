@@ -33,7 +33,7 @@ export const TripDetail: React.FC = () => {
       <header className="budgee-trip-header">
         <div className="budgee-trip-header-top">
           <Button variant="ghost" onClick={() => navigate('/')} className="px-2">
-            <ArrowLeft size={22} /> 返回
+            <ArrowLeft size={24} />
           </Button>
           <h1 className="budgee-trip-title">
             {activeTrip.title}
@@ -43,7 +43,7 @@ export const TripDetail: React.FC = () => {
               </span>
             )}
           </h1>
-          <div className="min-w-\[80px\]" />
+          <div style={{ minWidth: 48 }} />
         </div>
 
         <nav className="budgee-trip-tabs">

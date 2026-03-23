@@ -80,9 +80,9 @@ export async function exportTripAsPdf(tripId: string): Promise<void> {
     body { font-family: -apple-system, 'PingFang TC', 'Noto Sans TC', sans-serif; font-size: 13px; color: #111; padding: 20mm 15mm; }
     h1 { font-size: 22px; margin-bottom: 4px; }
     .meta { color: #666; font-size: 12px; margin-bottom: 16px; }
-    h2 { font-size: 15px; margin: 20px 0 8px; border-bottom: 1.5px solid #2563eb; padding-bottom: 4px; color: #2563eb; }
+    h2 { font-size: 15px; margin: 20px 0 8px; border-bottom: 1.5px solid #4d8c0a; padding-bottom: 4px; color: #4d8c0a; }
     table { width: 100%; border-collapse: collapse; }
-    th { background: #2563eb; color: #fff; padding: 6px 8px; text-align: left; font-size: 12px; }
+    th { background: #4d8c0a; color: #fff; padding: 6px 8px; text-align: left; font-size: 12px; }
     td { padding: 5px 8px; border-bottom: 1px solid #e5e7eb; font-size: 12px; }
     tr:nth-child(even) td { background: #f8f9fa; }
     .num { text-align: right; }

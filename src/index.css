@@ -1,16 +1,16 @@
 :root {
   /* Colors - Light Theme */
   --bg-main: #ffffff;
-  --bg-card: #f8f9fa;
-  --text-main: #1a1a1a;
-  --text-muted: #4b5563;
-  --border-color: #e5e7eb;
-  
+  --bg-card: #f5f5f5;
+  --text-main: #333333;
+  --text-muted: #666666;
+  --border-color: #e0e0e0;
+
   /* Semantic Colors */
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-danger: #dc2626; /* Red for alerts, owed amount */
-  --color-success: #16a34a; /* Green for cleared, refund amount */
+  --color-primary: #4d8c0a;
+  --color-primary-hover: rgba(77, 140, 10, 0.18);
+  --color-danger: #dc2626;
+  --color-success: #16a34a;
   --color-neutral: #6b7280;
 
   /* Typography */
@@ -41,41 +41,6 @@
   color-scheme: light;
 }
 
-/* Dark Mode Variables - Manual Toggle */
-:root.dark {
-  --bg-main: #111827;
-  --bg-card: #1f2937;
-  --text-main: #f9fafb;
-  --text-muted: #9ca3af;
-  --border-color: #374151;
-  
-  /* Semantic Colors in dark mode */
-  --color-primary: #3b82f6;
-  --color-primary-hover: #60a5fa;
-  --color-danger: #ef4444;
-  --color-success: #22c55e;
-  
-  color-scheme: dark;
-}
-
-/* Dark Mode Variables - System Preference */
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    --bg-main: #111827;
-    --bg-card: #1f2937;
-    --text-main: #f9fafb;
-    --text-muted: #9ca3af;
-    --border-color: #374151;
-    
-    /* Semantic Colors in dark mode */
-    --color-primary: #3b82f6;
-    --color-primary-hover: #60a5fa;
-    --color-danger: #ef4444;
-    --color-success: #22c55e;
-    
-    color-scheme: dark;
-  }
-}
 
 /* Base Resets */
 *, *::before, *::after {
@@ -160,6 +125,8 @@ body {
 .budgee-input {
   display: block;
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   min-height: 48px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
@@ -174,6 +141,21 @@ body {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px var(--color-primary-hover);
+}
+input[type="date"].budgee-input,
+select.budgee-input {
+  -webkit-appearance: none;
+  appearance: none;
+  max-width: 100%;
+  overflow: hidden;
+}
+select.budgee-input {
+  height: 48px;
+  line-height: 48px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
 }
 .input-error {
   border-color: var(--color-danger);
