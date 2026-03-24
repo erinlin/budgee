@@ -53,13 +53,23 @@ export const useTripStore = create<TripState>((set, get) => ({
   },
 
   createTrip: async (tripData) => {
+    let defaultTypes = createDefaultExpenseTypes();
+    try {
+      const { db: database } = await import('../db');
+      const appSettings = await database.appSettings.get('global');
+      if (appSettings?.defaultExpenseTypes?.length) {
+        defaultTypes = appSettings.defaultExpenseTypes;
+      }
+    } catch {
+      // fallback to hardcode
+    }
     const newTrip: Trip = {
       ...tripData,
       id: uuidv4(),
       archived: false,
       expenseTypes: tripData.expenseTypes.length > 0
         ? tripData.expenseTypes
-        : createDefaultExpenseTypes(),
+        : defaultTypes,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };

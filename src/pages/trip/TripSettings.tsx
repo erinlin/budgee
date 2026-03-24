@@ -1,11 +1,11 @@
-import React, { useRef, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useTripStore } from '../../stores/tripStore';
 import { Button } from '../../components/ui/Button';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
-import { exportTripAsJson, importTripFromJson, type ImportConflictAction } from '../../utils/exportImport';
+import { exportTripAsJson } from '../../utils/exportImport';
 import { exportTripAsPdf } from '../../utils/pdfExport';
-import { Edit, Archive, Trash2, Tag, ChevronRight, Lock, Download, Upload, FileText } from 'lucide-react';
+import { Edit, Archive, Trash2, Lock, Upload, FileText } from 'lucide-react';
 
 export const TripSettings: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,10 +14,6 @@ export const TripSettings: React.FC = () => {
 
   const [archiveConfirmOpen, setArchiveConfirmOpen] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [importConflict, setImportConflict] = useState(false);
-  const [pendingFile, setPendingFile] = useState<File | null>(null);
-  const [importError, setImportError] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = async () => {
     if (!id) return;
@@ -26,28 +22,6 @@ export const TripSettings: React.FC = () => {
     } catch (e) {
       alert('匯出失敗：' + (e as Error).message);
     }
-  };
-
-  const handleImportFile = async (file: File, action?: ImportConflictAction) => {
-    setImportError('');
-    try {
-      const result = await importTripFromJson(file, action);
-      if (result.conflictExists) {
-        setPendingFile(file);
-        setImportConflict(true);
-        return;
-      }
-      alert(`匯入成功：${result.trip.title}`);
-      navigate('/');
-    } catch (e) {
-      setImportError('匯入失敗：' + (e as Error).message);
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleImportFile(file);
-    e.target.value = '';
   };
 
   if (!activeTrip || !id) return null;
@@ -95,37 +69,12 @@ export const TripSettings: React.FC = () => {
         </div>
       </section>
 
-      {/* 花費類型入口 */}
+      {/* 匯出 */}
       <section>
-        <h2 className="text-xl font-bold mb-4">花費類型</h2>
-        <Link
-          to={`/trip/${id}/expense-types`}
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--bg-card)', border: '1.5px solid var(--border-color)', borderRadius: 'var(--radius-lg)', padding: 'var(--spacing-md) var(--spacing-lg)', textDecoration: 'none', color: 'var(--text-main)', transition: 'box-shadow 0.15s' }}
-          onMouseOver={(e) => (e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.07)')}
-          onMouseOut={(e) => (e.currentTarget.style.boxShadow = '')}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--spacing-md)' }}>
-            <Tag size={22} style={{ color: 'var(--color-primary)' }} />
-            <div>
-              <div className="font-semibold" style={{ fontSize: 'var(--font-size-lg)' }}>管理花費類型</div>
-              <div style={{ color: 'var(--text-muted)', fontSize: '0.9em' }}>
-                {activeTrip.expenseTypes.length} 個類型（{activeTrip.expenseTypes.filter(t => !t.builtIn).length} 個自訂）
-              </div>
-            </div>
-          </div>
-          <ChevronRight size={20} style={{ color: 'var(--text-muted)' }} />
-        </Link>
-      </section>
-
-      {/* 匯出/匯入 */}
-      <section>
-        <h2 className="text-xl font-bold mb-4">資料匯出/匯入</h2>
+        <h2 className="text-xl font-bold mb-4">資料匯出</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
           <Button variant="secondary" className="w-full" onClick={handleExport}>
             <Upload size={20} /> 匯出 JSON 備份
-          </Button>
-          <Button variant="secondary" className="w-full" onClick={() => fileInputRef.current?.click()}>
-            <Download size={20} /> 匯入 JSON 旅行
           </Button>
           <Button
             variant="secondary"
@@ -141,16 +90,6 @@ export const TripSettings: React.FC = () => {
           >
             <FileText size={20} /> 匯出 PDF 報表
           </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json"
-            style={{ display: 'none' }}
-            onChange={handleFileChange}
-          />
-          {importError && (
-            <p style={{ color: 'var(--color-danger)', fontWeight: 500 }}>{importError}</p>
-          )}
         </div>
       </section>
 
@@ -185,24 +124,6 @@ export const TripSettings: React.FC = () => {
         confirmText="確定刪除"
         onConfirm={handleDelete}
         onCancel={() => setDeleteConfirmOpen(false)}
-      />
-
-      <ConfirmDialog
-        isOpen={importConflict}
-        title="旅行 ID 衝突"
-        description="已有相同 ID 的旅行，請選擇操作方式：「覆蓋」將替換現有資料；「並存」將建立一份副本。"
-        confirmText="覆蓋現有"
-        cancelText="建立副本（並存）"
-        onConfirm={async () => {
-          setImportConflict(false);
-          if (pendingFile) await handleImportFile(pendingFile, 'overwrite');
-          setPendingFile(null);
-        }}
-        onCancel={async () => {
-          setImportConflict(false);
-          if (pendingFile) await handleImportFile(pendingFile, 'coexist');
-          setPendingFile(null);
-        }}
       />
     </div>
   );

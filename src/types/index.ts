@@ -66,3 +66,8 @@ export interface Collection {
   note: string;
   collectedAt: number;
 }
+
+export interface AppSettings {
+  id: 'global';
+  defaultExpenseTypes: ExpenseType[];
+}

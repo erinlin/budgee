@@ -42,6 +42,9 @@ export type ImportConflictAction = 'overwrite' | 'coexist';
 export interface ImportResult {
   trip: Trip;
   conflictExists: boolean;
+  localExportedAt?: number;
+  localExpenseCount?: number;
+  importExpenseCount?: number;
 }
 
 export async function importTripFromJson(
@@ -59,8 +62,14 @@ export async function importTripFromJson(
   const conflictExists = !!existingTrip;
 
   if (conflictExists && !conflictAction) {
-    // 回傳衝突資訊，讓呼叫端決定
-    return { trip: data.trip, conflictExists: true };
+    const localExpenses = await db.expenses.where({ tripId: data.trip.id }).toArray();
+    return {
+      trip: data.trip,
+      conflictExists: true,
+      localExportedAt: existingTrip.updatedAt,
+      localExpenseCount: localExpenses.length,
+      importExpenseCount: data.expenses.length,
+    };
   }
 
   if (conflictExists && conflictAction === 'coexist') {

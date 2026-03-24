@@ -6,10 +6,10 @@ import { TripEdit } from './pages/TripEdit';
 import { TripDetail } from './pages/trip/TripDetail';
 import { Members } from './pages/trip/Members';
 import { TripSettings } from './pages/trip/TripSettings';
-import { ExpenseTypes } from './pages/trip/ExpenseTypes';
 import { Expenses } from './pages/trip/Expenses';
 import { Collections } from './pages/trip/Collections';
 import { Personal } from './pages/trip/Personal';
+import { AppSettings } from './pages/AppSettings';
 
 function App() {
   const { initialize } = useThemeStore();
@@ -32,8 +32,8 @@ function App() {
             <Route path="personal" element={<Personal />} />
             <Route path="members" element={<Members />} />
             <Route path="settings" element={<TripSettings />} />
-            <Route path="expense-types" element={<ExpenseTypes />} />
           </Route>
+          <Route path="/settings" element={<AppSettings />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
