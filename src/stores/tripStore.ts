@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { db } from '../db';
-import type { Trip, Member, Role, ExpenseType } from '../types';
+import type { Trip, Member, ExpenseType } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { createDefaultExpenseTypes } from '../data/defaultExpenseTypes';
 

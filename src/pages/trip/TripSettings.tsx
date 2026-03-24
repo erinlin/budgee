@@ -122,10 +122,10 @@ export const TripSettings: React.FC = () => {
         <h2 className="text-xl font-bold mb-4">資料匯出/匯入</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
           <Button variant="secondary" className="w-full" onClick={handleExport}>
-            <Download size={20} /> 匯出 JSON 備份
+            <Upload size={20} /> 匯出 JSON 備份
           </Button>
           <Button variant="secondary" className="w-full" onClick={() => fileInputRef.current?.click()}>
-            <Upload size={20} /> 匯入 JSON 旅行
+            <Download size={20} /> 匯入 JSON 旅行
           </Button>
           <Button
             variant="secondary"
