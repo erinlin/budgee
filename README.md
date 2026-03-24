@@ -16,13 +16,13 @@
 
 | 類別 | 技術 |
 |------|------|
-| 前端框架 | React 18 + TypeScript |
+| 前端框架 | React 19 + TypeScript |
 | 建置工具 | Vite |
 | 本地資料庫 | Dexie.js（IndexedDB） |
 | 狀態管理 | Zustand |
 | 表格 | TanStack Table v8 |
 | PWA | vite-plugin-pwa + Workbox |
-| 樣式 | CSS 變數 + Tailwind utility |
+| 樣式 | Vanilla CSS 變數（設計令牌系統） |
 
 ## 本地開發
 

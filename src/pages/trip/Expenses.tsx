@@ -171,7 +171,7 @@ export const Expenses: React.FC = () => {
                       </td>
                     ))}
                     <td onClick={e => e.stopPropagation()}>
-                      <div className="flex gap-1 justify-end">
+                      <div className="flex gap-3 justify-end">
                         {!isArchived && (
                           <>
                             <button
@@ -179,14 +179,14 @@ export const Expenses: React.FC = () => {
                               onClick={() => handleEdit(row.original)}
                               aria-label="編輯"
                             >
-                              <Edit2 size={18} />
+                              <Edit2 size={20} />
                             </button>
                             <button
                               className="icon-btn danger"
                               onClick={() => setDeleteTarget(row.original)}
                               aria-label="刪除"
                             >
-                              <Trash2 size={18} />
+                              <Trash2 size={20} />
                             </button>
                           </>
                         )}

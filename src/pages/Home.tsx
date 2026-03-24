@@ -174,7 +174,7 @@ export const Home: React.FC = () => {
             <div
               key={trip.id}
               onClick={() => navigate(`/trip/${trip.id}`)}
-              className="flex items-center justify-between p-5 bg-white rounded-xl shadow-sm hover:shadow-md cursor-pointer transition-shadow" style={{ border: '1.5px solid var(--color-primary)' }}
+              className="trip-card flex items-center justify-between"
             >
               <div>
                 <div className="flex items-center gap-3 mb-2">

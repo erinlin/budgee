@@ -3,18 +3,18 @@
   --bg-main: #ffffff;
   --bg-card: #f5f5f5;
   --text-main: #333333;
-  --text-muted: #666666;
+  --text-muted: #555555;
   --border-color: #e0e0e0;
 
   /* Semantic Colors */
-  --color-primary: #4d8c0a;
-  --color-primary-hover: rgba(77, 140, 10, 0.18);
+  --color-primary: #437d00;
+  --color-primary-hover: rgba(67, 125, 0, 0.18);
   --color-danger: #dc2626;
   --color-success: #16a34a;
   --color-neutral: #6b7280;
 
   /* Typography */
-  --font-sans: system-ui, -apple-system, sans-serif;
+  --font-sans: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
   --font-size-base: 18px; /* Elder friendly */
   --font-size-lg: 20px;
   --font-size-h1: 32px;
@@ -30,8 +30,14 @@
   --spacing-lg: 24px;
   
   /* Borders */
-  --radius-md: 4px;
-  --radius-lg: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
   
   font-family: var(--font-sans);
   font-size: var(--font-size-base);
@@ -62,6 +68,23 @@ body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+  .budgee-btn:active:not(:disabled) {
+    transform: none;
+  }
+}
+
+/* Focus Visible */
+.budgee-btn:focus-visible,
+.icon-btn:focus-visible,
+.btn-ghost:focus-visible,
+.budgee-trip-tab:focus-visible,
+.quick-chip:focus-visible,
+.category-toggle-btn:focus-visible,
+.member-checkbox-item:focus-visible,
+.modal-close:focus-visible,
+.member-delete:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 /* Utility Classes */
@@ -87,6 +110,10 @@ body {
   justify-content: center;
   gap: var(--spacing-sm);
 }
+.budgee-btn:active:not(:disabled) {
+  transform: scale(0.97);
+  filter: brightness(0.9);
+}
 .budgee-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -96,7 +123,7 @@ body {
   color: white;
 }
 .btn-primary:hover:not(:disabled) {
-  background-color: var(--color-primary-hover);
+  background-color: #356300;
 }
 .btn-secondary {
   background-color: var(--bg-card);
@@ -212,7 +239,7 @@ select.budgee-input {
   padding: var(--spacing-lg);
   max-width: 480px;
   width: 100%;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-lg);
 }
 .budgee-dialog h2 {
   font-size: var(--font-size-h2);
@@ -235,6 +262,7 @@ select.budgee-input {
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
   background: var(--bg-main);
+  box-shadow: var(--shadow-sm);
 }
 .budgee-table {
   width: 100%;
@@ -251,11 +279,28 @@ select.budgee-input {
   font-weight: 600;
   user-select: none;
 }
+.budgee-table tbody tr:nth-child(even) {
+  background: rgba(0, 0, 0, 0.025);
+}
 .budgee-table tr.clickable-row {
   cursor: pointer;
 }
 .budgee-table tr.clickable-row:hover {
   background: var(--bg-card);
+}
+
+/* ===== Trip Card (Home) ===== */
+.trip-card {
+  padding: var(--spacing-lg);
+  background: var(--bg-main);
+  border: 1.5px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.trip-card:hover {
+  box-shadow: var(--shadow-lg);
 }
 
 /* ===== Trip Detail Header & Tabs ===== */
@@ -358,6 +403,7 @@ select.budgee-input {
   transition: color 0.15s, background-color 0.15s;
   flex-shrink: 0;
   margin-left: auto;
+  margin-inline-start: var(--spacing-md);
 }
 .member-delete:hover {
   color: var(--color-danger);
@@ -578,8 +624,12 @@ select.budgee-input {
   overflow-x: auto;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
+.expense-row:nth-child(even) {
+  background: rgba(0, 0, 0, 0.025);
+}
 .expense-row:hover {
   background: var(--bg-card);
 }
@@ -624,6 +674,7 @@ select.budgee-input {
   overflow-x: auto;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
 }
 
 /* ===== Balance Summary Card ===== */
@@ -632,6 +683,7 @@ select.budgee-input {
   border: 1.5px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .balance-summary-grid {
