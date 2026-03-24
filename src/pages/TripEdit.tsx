@@ -64,7 +64,7 @@ export const TripEdit: React.FC = () => {
           members: [],
           expenseTypes: [],
         });
-        navigate(`/trip/${newId}`); // Redirect to trip details
+        navigate(`/trip/${newId}/members`); // 跳轉到旅伴頁面
       }
     } catch (err) {
       console.error(err);
