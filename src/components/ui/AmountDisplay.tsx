@@ -8,10 +8,12 @@ interface AmountDisplayProps extends React.HTMLAttributes<HTMLSpanElement> {
 }
 
 export const AmountDisplay: React.FC<AmountDisplayProps> = ({ amount, size, className, ...props }) => {
+  const rounded = Math.round(amount * 100) / 100;
+
   let colorClass = '';
-  if (amount > 0) {
+  if (rounded > 0) {
     colorClass = 'text-danger';
-  } else if (amount < 0) {
+  } else if (rounded < 0) {
     colorClass = 'text-success';
   } else {
     colorClass = 'text-muted';
@@ -21,7 +23,7 @@ export const AmountDisplay: React.FC<AmountDisplayProps> = ({ amount, size, clas
 
   return (
     <span className={classNames('amount-display', colorClass, sizeClass, className)} {...props}>
-      {amount < 0 ? '-' : ''}{fmt(Math.abs(amount))}
+      {rounded < 0 ? '-' : ''}{fmt(Math.abs(rounded))}
     </span>
   );
 };
