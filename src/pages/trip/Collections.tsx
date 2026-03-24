@@ -230,7 +230,7 @@ export const Collections: React.FC = () => {
                   <tr key={c.id}>
                     <td className="font-semibold">{getMemberName(c.memberId)}</td>
                     <td className="text-right">
-                      <span style={{ fontWeight: 600, color: c.type === 'payout' ? 'var(--color-warning, #f97316)' : undefined }}>{fmt(c.amount)}</span>
+                      <span style={{ fontWeight: 600, color: c.type === 'payout' ? 'var(--color-success)' : undefined }}>{fmt(c.amount)}</span>
                     </td>
                     <td style={{ color: 'var(--text-muted)' }}>{c.note || '—'}</td>
                     {!isArchived && (

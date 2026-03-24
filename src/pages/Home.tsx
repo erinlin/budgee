@@ -4,7 +4,7 @@ import { useTripStore } from '../stores/tripStore';
 import { Button } from '../components/ui/Button';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { importTripFromJson, type ImportConflictAction, type ImportResult } from '../utils/exportImport';
-import { Plus, Archive, ChevronRight, Calendar, Download, Settings, Menu, Bird } from 'lucide-react';
+import { Plus, Archive, ChevronRight, Calendar, Upload, Settings, Menu, Bird } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const { trips, loadTrips, isLoading } = useTripStore();
@@ -109,15 +109,15 @@ export const Home: React.FC = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-4 budgee-page">
+    <div className="max-w-2xl mx-auto px-4 mb-4 budgee-page">
       <header className="flex items-center justify-between mb-8">
         <h1 style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Bird size={32} style={{ color: 'var(--color-primary)' }} />
           Budgee
         </h1>
         <div ref={menuRef} style={{ position: 'relative' }}>
-          <Button variant="secondary" onClick={() => setMenuOpen((v) => !v)} aria-label="選單" style={{ width: 48, height: 48, padding: 0 }}>
-            <Menu size={22} />
+          <Button variant="ghost" onClick={() => setMenuOpen((v) => !v)} aria-label="選單" style={{ width: 48, height: 48, padding: 0, background: 'none', border: 'none', color: 'var(--color-primary)' }}>
+            <Menu size={28} />
           </Button>
           {menuOpen && (
             <div style={{
@@ -143,7 +143,7 @@ export const Home: React.FC = () => {
                 style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '14px 18px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-base)', color: 'var(--text-main)', textAlign: 'left' }}
                 onClick={() => { setMenuOpen(false); fileInputRef.current?.click(); }}
               >
-                <Download size={18} /> 匯入旅行
+                <Upload size={18} /> 匯入旅行
               </button>
               <div style={{ height: 1, background: 'var(--border-color)' }} />
               <button
@@ -174,7 +174,7 @@ export const Home: React.FC = () => {
             <div
               key={trip.id}
               onClick={() => navigate(`/trip/${trip.id}`)}
-              className="flex items-center justify-between p-5 bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md cursor-pointer transition-shadow"
+              className="flex items-center justify-between p-5 bg-white rounded-xl shadow-sm hover:shadow-md cursor-pointer transition-shadow" style={{ border: '1.5px solid var(--color-primary)' }}
             >
               <div>
                 <div className="flex items-center gap-3 mb-2">
