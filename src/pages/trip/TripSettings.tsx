@@ -5,7 +5,7 @@ import { Button } from '../../components/ui/Button';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { exportTripAsJson } from '../../utils/exportImport';
 import { exportTripAsPdf } from '../../utils/pdfExport';
-import { Edit, Archive, Trash2, Lock, Upload, FileText } from 'lucide-react';
+import { Edit, Archive, Trash2, Lock, Download, FileText } from 'lucide-react';
 
 export const TripSettings: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -74,7 +74,7 @@ export const TripSettings: React.FC = () => {
         <h2 className="text-xl font-bold mb-4">資料匯出</h2>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
           <Button variant="secondary" className="w-full" onClick={handleExport}>
-            <Upload size={20} /> 匯出 JSON 備份
+            <Download size={20} /> 匯出 JSON 備份
           </Button>
           <Button
             variant="secondary"

@@ -4,7 +4,7 @@ import { useTripStore } from '../stores/tripStore';
 import { Button } from '../components/ui/Button';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { importTripFromJson, type ImportConflictAction, type ImportResult } from '../utils/exportImport';
-import { Plus, Archive, ChevronRight, Calendar, Download, Settings, Menu } from 'lucide-react';
+import { Plus, Archive, ChevronRight, Calendar, Download, Settings, Menu, Bird } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const { trips, loadTrips, isLoading } = useTripStore();
@@ -111,7 +111,10 @@ export const Home: React.FC = () => {
   return (
     <div className="max-w-2xl mx-auto p-4 budgee-page">
       <header className="flex items-center justify-between mb-8">
-        <h1>Budgee</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Bird size={32} style={{ color: 'var(--color-primary)' }} />
+          Budgee
+        </h1>
         <div ref={menuRef} style={{ position: 'relative' }}>
           <Button variant="secondary" onClick={() => setMenuOpen((v) => !v)} aria-label="選單" style={{ width: 48, height: 48, padding: 0 }}>
             <Menu size={22} />
