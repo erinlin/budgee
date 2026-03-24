@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTripStore } from '../../stores/tripStore';
 import { useQuickStartStore } from '../../stores/quickStartStore';
@@ -16,6 +16,18 @@ export const Members: React.FC = () => {
   const [nickname, setNickname] = useState('');
   const [error, setError] = useState('');
   const [showQuickPick, setShowQuickPick] = useState(false);
+  const quickPickRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showQuickPick) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (quickPickRef.current && !quickPickRef.current.contains(e.target as Node)) {
+        setShowQuickPick(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showQuickPick]);
 
   const [memberToDelete, setMemberToDelete] = useState<{ id: string; name: string } | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -69,35 +81,35 @@ export const Members: React.FC = () => {
     <div className="space-y-8">
       {!isArchived && (
         <section>
-          <h2 className="text-xl font-bold mb-4">新增旅伴</h2>
-
-          {memberNicknames.length > 0 && (
-            <div className="mb-4" style={{ position: 'relative' }}>
-              <button
-                type="button"
-                className="budgee-input cursor-pointer"
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}
-                onClick={() => setShowQuickPick(v => !v)}
-              >
-                <span style={{ color: 'var(--text-muted)' }}>常用旅伴（{memberNicknames.length} 人）</span>
-                <ChevronDown size={18} style={{ flexShrink: 0, transform: showQuickPick ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
-              </button>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+            <h2 className="text-xl font-bold" style={{ margin: 0 }}>新增旅伴</h2>
+            {memberNicknames.length > 0 && (
+              <div ref={quickPickRef} style={{ position: 'relative' }}>
+                <button
+                  type="button"
+                  className="budgee-input cursor-pointer"
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, width: 'auto', minHeight: 36, padding: '0 12px', fontSize: '0.9em' }}
+                  onClick={() => setShowQuickPick(v => !v)}
+                >
+                  <span style={{ color: 'var(--text-muted)' }}>常用旅伴</span>
+                  <ChevronDown size={16} style={{ flexShrink: 0, transform: showQuickPick ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                </button>
               {showQuickPick && (
                 <div style={{
                   position: 'absolute',
                   top: 'calc(100% + 4px)',
-                  left: 0,
                   right: 0,
+                  width: 280,
                   background: 'var(--bg-card)',
-                  border: '1.5px solid var(--border)',
+                  border: '1.5px solid var(--border-color)',
                   borderRadius: 'var(--radius-lg)',
                   boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
                   zIndex: 100,
-                  padding: 'var(--spacing-sm)',
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 8,
-                  maxHeight: 240,
+                  padding: 8,
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(5, 1fr)',
+                  gap: 4,
+                  maxHeight: 260,
                   overflowY: 'auto',
                 }}>
                   {[...memberNicknames].reverse().map(name => (
@@ -114,6 +126,7 @@ export const Members: React.FC = () => {
               )}
             </div>
           )}
+          </div>
 
           <form onSubmit={handleAddSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
             <div>
@@ -151,7 +164,7 @@ export const Members: React.FC = () => {
           </span>
         </h2>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
           {activeTrip.members.map(member => (
             <div key={member.id} className="member-card-row">
               <span className="font-semibold flex-1 min-w-0" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
