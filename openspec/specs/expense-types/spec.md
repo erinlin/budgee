@@ -4,7 +4,7 @@
 ## Requirements
 
 ### Requirement: 內建花費類型
-系統 SHALL 預設提供以下內建花費類型，使用者不可刪除內建類型：
+系統 SHALL 在建立新旅行時，從 `appSettings.defaultExpenseTypes`（IndexedDB）讀取預設花費類型套用至新旅行；若 `appSettings` 尚未初始化，則 fallback 至 `createDefaultExpenseTypes()` hardcode 值。使用者不可刪除 `builtIn: true` 的類型。
 
 | 類型名稱   | 計算模式   | 預設人員 | 說明                        |
 |-----------|-----------|---------|---------------------------|
@@ -22,6 +22,10 @@
 #### Scenario: 無法刪除內建類型
 - **WHEN** 使用者嘗試刪除內建花費類型
 - **THEN** 系統不提供刪除選項
+
+#### Scenario: 建立旅行套用全域預設
+- **WHEN** 使用者建立新旅行
+- **THEN** 系統從 `appSettings.defaultExpenseTypes` 讀取預設類型套用至新旅行；若讀取失敗則 fallback 至 hardcode 預設值
 
 ---
 
