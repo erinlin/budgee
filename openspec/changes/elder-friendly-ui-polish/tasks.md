@@ -1,6 +1,6 @@
 ## 1. P0 - 對比度與可讀性
 
-- [x] 1.1 修改 `:root` 中 `--color-primary` 為 `#3d7000`，`--color-primary-hover` 同步調整為 `rgba(61, 112, 0, 0.18)`
+- [x] 1.1 修改 `:root` 中 `--color-primary` 為 `#437d00`，`--color-primary-hover` 同步調整為 `rgba(67, 125, 0, 0.18)`
 - [x] 1.2 修改 `:root` 中 `--text-muted` 為 `#555555`
 - [x] 1.3 為 `.budgee-table tbody tr:nth-child(even)` 加入斑馬紋背景色
 - [x] 1.4 為 `.expense-row:nth-child(even)` 加入斑馬紋背景色

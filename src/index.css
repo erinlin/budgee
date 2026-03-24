@@ -8,6 +8,7 @@
 
   /* Semantic Colors */
   --color-primary: #437d00;
+  --color-primary-dark: #356300;
   --color-primary-hover: rgba(67, 125, 0, 0.18);
   --color-danger: #dc2626;
   --color-success: #16a34a;
@@ -123,7 +124,7 @@ body {
   color: white;
 }
 .btn-primary:hover:not(:disabled) {
-  background-color: #356300;
+  background-color: var(--color-primary-dark);
 }
 .btn-secondary {
   background-color: var(--bg-card);
