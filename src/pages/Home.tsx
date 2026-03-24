@@ -133,24 +133,24 @@ export const Home: React.FC = () => {
               overflow: 'hidden',
             }}>
               <button
-                style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '14px 18px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-base)', color: 'var(--text-main)', textAlign: 'left' }}
+                style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '14px 18px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-lg)', color: 'var(--text-main)', textAlign: 'left', fontFamily: 'inherit' }}
                 onClick={() => { setMenuOpen(false); navigate('/trip/new'); }}
               >
-                <Plus size={18} /> 新增旅行
+                <Plus size={20} /> 新增旅行
               </button>
               <div style={{ height: 1, background: 'var(--border-color)' }} />
               <button
-                style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '14px 18px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-base)', color: 'var(--text-main)', textAlign: 'left' }}
+                style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '14px 18px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-lg)', color: 'var(--text-main)', textAlign: 'left', fontFamily: 'inherit' }}
                 onClick={() => { setMenuOpen(false); fileInputRef.current?.click(); }}
               >
-                <Upload size={18} /> 匯入旅行
+                <Upload size={20} /> 匯入旅行
               </button>
               <div style={{ height: 1, background: 'var(--border-color)' }} />
               <button
-                style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '14px 18px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-base)', color: 'var(--text-main)', textAlign: 'left' }}
+                style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '14px 18px', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'var(--font-size-lg)', color: 'var(--text-main)', textAlign: 'left', fontFamily: 'inherit' }}
                 onClick={() => { setMenuOpen(false); navigate('/settings'); }}
               >
-                <Settings size={18} /> App 設定
+                <Settings size={20} /> App 設定
               </button>
             </div>
           )}
