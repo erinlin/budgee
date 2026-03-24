@@ -70,8 +70,9 @@ export async function exportTripAsPdf(tripId: string): Promise<void> {
   }).join('');
 
   const balanceRows = balances.map(b => {
-    const balanceLabel = b.balance > 0 ? '待繳' : b.balance < 0 ? '待退' : '結清';
-    const balanceClass = b.balance > 0 ? 'owe' : b.balance < 0 ? 'refund' : '';
+    const roundedBalance = Math.round(b.balance);
+    const balanceLabel = roundedBalance > 0 ? '待繳' : roundedBalance < 0 ? '待退' : '結清';
+    const balanceClass = roundedBalance > 0 ? 'owe' : roundedBalance < 0 ? 'refund' : '';
     return `
       <tr>
         <td>${b.name}</td>

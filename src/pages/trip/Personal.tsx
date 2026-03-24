@@ -90,7 +90,7 @@ export const Personal: React.FC = () => {
                   <span className="label">最終</span>
                   <AmountDisplay amount={balance.balance} size="lg" />
                   <span className="hint">
-                    {balance.balance > 0 ? '（待繳）' : balance.balance < 0 ? '（待退）' : '（已結清）'}
+                    {Math.round(balance.balance) > 0 ? '（待繳）' : Math.round(balance.balance) < 0 ? '（待退）' : '（已結清）'}
                   </span>
                 </div>
               </div>
@@ -185,7 +185,7 @@ export const Personal: React.FC = () => {
                 <tbody>
                   {collections.map(c => (
                     <tr key={c.id}>
-                      <td className="font-semibold text-right" style={{ color: c.type === 'payout' ? 'var(--color-warning, #f97316)' : undefined }}>
+                      <td className="font-semibold text-right" style={{ color: c.type === 'payout' ? 'var(--color-success)' : undefined }}>
                         {fmt(c.amount)}
                       </td>
                       <td style={{ color: 'var(--text-muted)' }}>{c.note || '—'}</td>
