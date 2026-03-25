@@ -370,7 +370,7 @@ select.budgee-input {
   background: var(--bg-main);
   border: 1.5px solid var(--border-color);
   border-radius: var(--radius-lg);
-  padding: 0 var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
   min-height: 48px;
   transition: box-shadow 0.15s;
 }
