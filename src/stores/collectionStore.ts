@@ -6,13 +6,14 @@ import { calcBalances as calcBalancesUtil } from '../utils/balanceCalc';
 
 export interface MemberBalance {
   memberId: string;
-  splitTotal: number;     // 一般分攤總額（不含公費支出）
-  paidTotal: number;      // 代墊總額（含自身份額，排除公費）
-  collectedTotal: number; // 收款 - 退款
-  balance: number;        // (splitTotal + fundPrepaid) - paidTotal - collectedTotal（公費支出不影響餘額）
-  fundPrepaid: number;    // 預收公費總額
+  splitTotal: number;       // 一般分攤總額（不含公費支出）
+  paidTotal: number;        // 代墊總額（含自身份額，排除公費）
+  collectedTotal: number;   // 收款 - 退款（用於餘額計算）
+  displayCollected: number; // 自付份額 + 公費預繳 + 實際收款（純顯示用）
+  balance: number;          // (splitTotal + fundPrepaid) - paidTotal - collectedTotal（公費支出不影響餘額）
+  fundPrepaid: number;      // 預收公費總額
   fundExpenseShare: number; // 公費支出分攤總額
-  fundBalance: number;    // fundExpenseShare - fundPrepaid（負=公費剩餘可退，正=需補繳）
+  fundBalance: number;      // fundExpenseShare - fundPrepaid（負=公費剩餘可退，正=需補繳）
 }
 
 interface CollectionState {

@@ -84,7 +84,7 @@ export const Personal: React.FC = () => {
                 </div>
                 <div className="balance-summary-item">
                   <span className="label">已收總計</span>
-                  <span className="value">{fmt(balance.collectedTotal)}</span>
+                  <span className="value">{fmt(balance.displayCollected)}</span>
                 </div>
                 <div className="balance-summary-item final">
                   <span className="label">最終</span>

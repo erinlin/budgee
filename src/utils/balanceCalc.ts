@@ -20,6 +20,12 @@ export function calcBalances(
       return exp.paidBy === memberId ? sum + exp.totalAmount : sum;
     }, 0);
 
+    const selfPaidTotal = normalExpenses.reduce((sum, exp) => {
+      if (exp.paidBy !== memberId) return sum;
+      const split = exp.splits.find(s => s.memberId === memberId);
+      return sum + (split?.amount ?? 0);
+    }, 0);
+
     const collectOnlyTotal = collections
       .filter(c => c.memberId === memberId && c.type !== 'payout')
       .reduce((sum, c) => sum + c.amount, 0);
@@ -44,12 +50,15 @@ export function calcBalances(
     const balance = splitTotal + fundPrepaid - paidTotal - collectedTotal;
     // 公費餘額 = 公費支出 - 預收公費（負=可退，正=需補繳）
     const fundBalance = fundExpenseShare - fundPrepaid;
+    // 已收顯示 = 自付份額 + 公費預繳 + 實際收款（不含退款，純顯示用）
+    const displayCollected = selfPaidTotal + fundPrepaid + collectOnlyTotal;
 
     return {
       memberId,
       splitTotal,
       paidTotal,
       collectedTotal,
+      displayCollected,
       balance,
       fundPrepaid,
       fundExpenseShare,

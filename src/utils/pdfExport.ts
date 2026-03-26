@@ -60,7 +60,7 @@ export async function exportTripAsPdf(tripId: string): Promise<void> {
         <td class="num">${fmt(b.splitTotal)}</td>
         <td class="num">${fmt(b.fundPrepaid)}</td>
         <td class="num">${fmt(b.paidTotal)}</td>
-        <td class="num">${fmt(b.collectedTotal)}</td>
+        <td class="num">${fmt(b.displayCollected)}</td>
         <td class="num ${balanceClass}">${fmt(Math.abs(b.balance))}（${balanceLabel}）</td>
         <td class="num">${fmt(b.fundExpenseShare)}</td>
         <td class="num ${fundBalanceClass}">${fmt(Math.abs(b.fundBalance))}${roundedFundBalance !== 0 ? `（${roundedFundBalance > 0 ? '需補繳' : '待退'}）` : ''}</td>
@@ -74,7 +74,7 @@ export async function exportTripAsPdf(tripId: string): Promise<void> {
         <td class="num">${fmt(b.splitTotal)}</td>
         ${hasFund ? `<td class="num">${fmt(b.fundPrepaid)}</td>` : ''}
         <td class="num">${fmt(b.paidTotal)}</td>
-        <td class="num">${fmt(b.collectedTotal)}</td>
+        <td class="num">${fmt(b.displayCollected)}</td>
         <td class="num ${balanceClass}">${fmt(Math.abs(b.balance))}（${balanceLabel}）</td>
       </tr>`;
   }).join('');

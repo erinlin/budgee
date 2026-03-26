@@ -112,7 +112,7 @@ export const Collections: React.FC = () => {
                     <td className="text-right">{fmt(b.splitTotal)}</td>
                     {hasFund && <td className="text-right">{fmt(b.fundPrepaid)}</td>}
                     <td className="text-right">{fmt(b.paidTotal)}</td>
-                    <td className="text-right">{fmt(b.collectedTotal)}</td>
+                    <td className="text-right">{fmt(b.displayCollected)}</td>
                     <td className="text-right">
                       <AmountDisplay amount={b.balance} />
                     </td>
