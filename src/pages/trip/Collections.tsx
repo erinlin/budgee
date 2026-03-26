@@ -17,6 +17,7 @@ export const Collections: React.FC = () => {
   const { collections, isLoading, loadCollections, addCollection, deleteCollection, calcBalances } = useCollectionStore();
 
   const [balances, setBalances] = useState<MemberBalance[]>([]);
+  const [activeTab, setActiveTab] = useState<'balance' | 'fund'>('balance');
   const [showForm, setShowForm] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
@@ -69,53 +70,99 @@ export const Collections: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* 餘額摘要表 */}
+      {/* 餘額摘要 Tab */}
       <section>
-        <h2 className="section-title">每人餘額</h2>
+        {hasFund && (
+          <nav className="pill-tabs">
+            <button
+              className={`pill-tab${activeTab === 'balance' ? ' active' : ''}`}
+              onClick={() => setActiveTab('balance')}
+            >
+              每人餘額
+            </button>
+            <button
+              className={`pill-tab${activeTab === 'fund' ? ' active' : ''}`}
+              onClick={() => setActiveTab('fund')}
+            >
+              公費支出
+            </button>
+          </nav>
+        )}
+        {!hasFund && <h2 className="section-title">每人餘額</h2>}
+
         {trip.members.length === 0 ? (
           <p style={{ color: 'var(--text-muted)' }}>尚未新增旅伴</p>
-        ) : (
+        ) : activeTab === 'balance' ? (
           <div className="balance-table-wrap">
             <table className="budgee-table">
               <thead>
                 <tr>
                   <th>成員</th>
-                  <th className="text-right">分攤{hasFund && <><br /><span style={{ fontSize: '0.85em', fontWeight: 400 }}>公費分攤</span></>}</th>
+                  <th className="text-right">分攤</th>
                   {hasFund && <th className="text-right">公費</th>}
                   <th className="text-right">代墊</th>
                   <th className="text-right">已收</th>
                   <th className="text-right">餘額</th>
-                  {hasFund && <th className="text-right">公費餘額</th>}
                 </tr>
               </thead>
               <tbody>
                 {balances.map(b => (
                   <tr key={b.memberId}>
                     <td className="font-semibold">{getMemberName(b.memberId)}</td>
-                    <td className="text-right">
-                      {fmt(b.splitTotal)}
-                      {hasFund && b.fundExpenseShare > 0 && (
-                        <div style={{ color: '#2e7d32', fontSize: '0.9em' }}>{fmt(b.fundExpenseShare)}</div>
-                      )}
-                    </td>
+                    <td className="text-right">{fmt(b.splitTotal)}</td>
                     {hasFund && <td className="text-right">{fmt(b.fundPrepaid)}</td>}
                     <td className="text-right">{fmt(b.paidTotal)}</td>
                     <td className="text-right">{fmt(b.collectedTotal)}</td>
                     <td className="text-right">
                       <AmountDisplay amount={b.balance} />
                     </td>
-                    {hasFund && (
-                      <td className="text-right">
-                        <AmountDisplay amount={b.fundBalance} />
-                      </td>
-                    )}
                   </tr>
                 ))}
               </tbody>
             </table>
             <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>
-              正值（紅）= 尚欠繳｜負值（綠）= 待退款{hasFund ? '｜公費餘額負值 = 可退' : ''}
+              正值（紅）= 尚欠繳｜負值（綠）= 待退款
             </p>
+          </div>
+        ) : (
+          /* 公費支出 Tab */
+          <div>
+            {(() => {
+              const fundMembers = balances.filter(b => b.fundPrepaid > 0);
+              const perPersonPrepaid = fundMembers.length > 0 ? fundMembers[0].fundPrepaid : 0;
+              return (
+                <>
+                  <div className="text-sm font-medium" style={{ marginBottom: 'var(--spacing-md)', color: 'var(--text-main)' }}>
+                    每人預收：{fmt(perPersonPrepaid)}
+                  </div>
+                  <div className="balance-table-wrap">
+                    <table className="budgee-table">
+                      <thead>
+                        <tr>
+                          <th>成員</th>
+                          <th className="text-right">公費分攤</th>
+                          <th className="text-right">公費餘額</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {fundMembers.map(b => (
+                          <tr key={b.memberId}>
+                            <td className="font-semibold">{getMemberName(b.memberId)}</td>
+                            <td className="text-right">{fmt(b.fundExpenseShare)}</td>
+                            <td className="text-right">
+                              <AmountDisplay amount={b.fundBalance} />
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>
+                      公費餘額 = 公費分攤 - 公費（負值 = 可退）
+                    </p>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         )}
       </section>
@@ -153,7 +200,7 @@ export const Collections: React.FC = () => {
                       } else if (bal < 0) {
                         setAmount(String(Math.round(Math.abs(bal))));
                         setCollType('payout');
-                        setNote('');
+                        setNote('退款');
                       } else {
                         setAmount('');
                         setCollType('collect');

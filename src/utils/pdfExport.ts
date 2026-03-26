@@ -26,9 +26,10 @@ export async function exportTripAsPdf(tripId: string): Promise<void> {
 
   const expenseRows = expenses.map(exp => {
     const paidBy = exp.category === 'public-fund' ? '公費' : getMemberName(trip, exp.paidBy);
-    const splitMembers = exp.splits.map(s =>
+    const splitNames = exp.splits.map(s =>
       trip.members.find(m => m.id === s.memberId)?.nickname ?? ''
-    ).filter(Boolean).join('、');
+    ).filter(Boolean);
+    const splitMembers = splitNames.length === trip.members.length ? '全員' : splitNames.join('、');
     return `
       <tr>
         <td>${formatDate(exp.date)}</td>
@@ -39,22 +40,42 @@ export async function exportTripAsPdf(tripId: string): Promise<void> {
       </tr>`;
   }).join('');
 
+  const isArchived = trip.archived;
+
   const balanceRows = balances.map(b => {
     const roundedBalance = Math.round(b.balance);
     const balanceLabel = roundedBalance > 0 ? '待繳' : roundedBalance < 0 ? '待退' : '結清';
     const balanceClass = roundedBalance > 0 ? 'owe' : roundedBalance < 0 ? 'refund' : '';
 
-    const roundedFundBalance = Math.round(b.fundBalance);
-    const fundBalanceClass = roundedFundBalance > 0 ? 'owe' : roundedFundBalance < 0 ? 'refund' : '';
+    if (isArchived && hasFund) {
+      const roundedFundBalance = Math.round(b.fundBalance);
+      const fundBalanceClass = roundedFundBalance > 0 ? 'owe' : roundedFundBalance < 0 ? 'refund' : '';
+      const finalSettlement = b.balance + b.fundBalance;
+      const roundedFinal = Math.round(finalSettlement);
+      const finalLabel = roundedFinal > 0 ? '待繳' : roundedFinal < 0 ? '待退' : '結清';
+      const finalClass = roundedFinal > 0 ? 'owe' : roundedFinal < 0 ? 'refund' : '';
+      return `
+      <tr>
+        <td>${b.name}</td>
+        <td class="num">${fmt(b.splitTotal)}</td>
+        <td class="num">${fmt(b.fundPrepaid)}</td>
+        <td class="num">${fmt(b.paidTotal)}</td>
+        <td class="num">${fmt(b.collectedTotal)}</td>
+        <td class="num ${balanceClass}">${fmt(Math.abs(b.balance))}（${balanceLabel}）</td>
+        <td class="num">${fmt(b.fundExpenseShare)}</td>
+        <td class="num ${fundBalanceClass}">${fmt(Math.abs(b.fundBalance))}${roundedFundBalance !== 0 ? `（${roundedFundBalance > 0 ? '需補繳' : '待退'}）` : ''}</td>
+        <td class="num ${finalClass}">${fmt(Math.abs(finalSettlement))}（${finalLabel}）</td>
+      </tr>`;
+    }
+
     return `
       <tr>
         <td>${b.name}</td>
-        <td class="num">${fmt(b.splitTotal)}${hasFund && b.fundExpenseShare > 0 ? `<br><span style="color:#2e7d32">${fmt(b.fundExpenseShare)}</span>` : ''}</td>
+        <td class="num">${fmt(b.splitTotal)}</td>
         ${hasFund ? `<td class="num">${fmt(b.fundPrepaid)}</td>` : ''}
         <td class="num">${fmt(b.paidTotal)}</td>
         <td class="num">${fmt(b.collectedTotal)}</td>
         <td class="num ${balanceClass}">${fmt(Math.abs(b.balance))}（${balanceLabel}）</td>
-        ${hasFund ? `<td class="num ${fundBalanceClass}">${fmt(b.fundBalance)}</td>` : ''}
       </tr>`;
   }).join('');
 
@@ -96,8 +117,11 @@ export async function exportTripAsPdf(tripId: string): Promise<void> {
 
   <h2>每人餘額摘要</h2>
   <table>
-    <thead><tr><th>旅伴</th><th style="text-align:right">分攤${hasFund ? '<br><span style="font-size:0.85em;font-weight:400">公費分攤</span>' : ''}</th>${hasFund ? '<th style="text-align:right">公費</th>' : ''}<th style="text-align:right">代墊</th><th style="text-align:right">已收</th><th style="text-align:right">餘額</th>${hasFund ? '<th style="text-align:right">公費餘額</th>' : ''}</tr></thead>
-    <tbody>${balanceRows || `<tr><td colspan="${hasFund ? 7 : 5}" style="text-align:center;color:#999">尚無成員</td></tr>`}</tbody>
+    <thead><tr>${isArchived && hasFund
+      ? '<th>旅伴</th><th style="text-align:right">分攤</th><th style="text-align:right">公費</th><th style="text-align:right">代墊</th><th style="text-align:right">已收</th><th style="text-align:right">餘額</th><th style="text-align:right">公費分攤</th><th style="text-align:right">公費餘額</th><th style="text-align:right">最終結算</th>'
+      : `<th>旅伴</th><th style="text-align:right">分攤</th>${hasFund ? '<th style="text-align:right">公費</th>' : ''}<th style="text-align:right">代墊</th><th style="text-align:right">已收</th><th style="text-align:right">餘額</th>`
+    }</tr></thead>
+    <tbody>${balanceRows || `<tr><td colspan="${isArchived && hasFund ? 9 : hasFund ? 6 : 5}" style="text-align:center;color:#999">尚無成員</td></tr>`}</tbody>
   </table>
 
   <footer>Budgee｜${trip.title}｜匯出於 ${new Date().toLocaleDateString('zh-TW')}</footer>

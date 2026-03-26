@@ -670,6 +670,32 @@ select.budgee-input {
   padding: var(--spacing-lg);
 }
 
+/* ===== Pill Tabs ===== */
+.pill-tabs {
+  display: inline-flex;
+  gap: 8px;
+  margin-bottom: var(--spacing-md);
+}
+.pill-tab {
+  padding: 8px 18px;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.pill-tab:hover {
+  color: var(--text-main);
+}
+.pill-tab.active {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+}
+
 /* ===== Balance Table ===== */
 .balance-table-wrap {
   overflow-x: auto;

@@ -67,11 +67,10 @@ export const Expenses: React.FC = () => {
     },
     {
       accessorKey: 'totalAmount',
-      header: () => <span className="text-right" style={{ display: 'block' }}>金額</span>,
+      header: '金額',
+      meta: { align: 'right' },
       cell: ({ getValue }) => (
-        <span className="text-right" style={{ display: 'block', fontWeight: 600 }}>
-          {fmt(getValue<number>())}
-        </span>
+        <span style={{ fontWeight: 600 }}>{fmt(getValue<number>())}</span>
       ),
     },
     {
@@ -145,9 +144,10 @@ export const Expenses: React.FC = () => {
                     <th
                       key={header.id}
                       onClick={header.column.getToggleSortingHandler()}
+                      className={(header.column.columnDef.meta as Record<string, string>)?.align === 'right' ? 'text-right' : ''}
                       style={{ cursor: header.column.getCanSort() ? 'pointer' : 'default', whiteSpace: 'nowrap' }}
                     >
-                      <span className="flex items-center gap-1">
+                      <span className={`flex items-center gap-1${(header.column.columnDef.meta as Record<string, string>)?.align === 'right' ? ' justify-end' : ''}`}>
                         {flexRender(header.column.columnDef.header, header.getContext())}
                         {header.column.getIsSorted() === 'asc' && <ChevronUp size={14} />}
                         {header.column.getIsSorted() === 'desc' && <ChevronDown size={14} />}
@@ -167,7 +167,7 @@ export const Expenses: React.FC = () => {
                     style={{ cursor: 'pointer' }}
                   >
                     {row.getVisibleCells().map(cell => (
-                      <td key={cell.id}>
+                      <td key={cell.id} className={(cell.column.columnDef.meta as Record<string, string>)?.align === 'right' ? 'text-right' : ''}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
