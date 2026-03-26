@@ -6,7 +6,7 @@ export interface Member {
   role: Role;
 }
 
-export type ExpenseCategory = "split" | "per-item" | "general";
+export type ExpenseCategory = "split" | "per-item" | "general" | "public-fund";
 
 export interface ExpenseOption {
   id: string;
@@ -46,13 +46,14 @@ export interface Split {
 export interface Expense {
   id: string;
   tripId: string;
-  category: 'split' | 'per-item';
+  category: 'split' | 'per-item' | 'public-fund';
   title: string;
   date: string; // YYYY-MM-DD
   totalAmount: number;
   paidBy: string | null; // memberId
   options?: ExpenseOption[]; // per-item 模式的內嵌選項定義
   splits: Split[];
+  fundSubType?: 'pre-collect' | 'expense';
 }
 
 export type CollectionType = "pre-collect" | "collect" | "payout";
