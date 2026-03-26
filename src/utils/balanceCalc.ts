@@ -50,8 +50,10 @@ export function calcBalances(
     const balance = splitTotal + fundPrepaid - paidTotal - collectedTotal;
     // 公費餘額 = 公費支出 - 預收公費（負=可退，正=需補繳）
     const fundBalance = fundExpenseShare - fundPrepaid;
-    // 已收顯示 = 自付份額 + 公費預繳 + 實際收款（不含退款，純顯示用）
-    const displayCollected = selfPaidTotal + fundPrepaid + collectOnlyTotal;
+    // 已收顯示 = 代墊實際覆蓋的自身份額 + 實際收款（純顯示用）
+    // 若代墊金額足夠，顯示完整自身義務（分攤 + 公費）；不足則顯示實際涵蓋金額
+    const selfCovered = Math.min(paidTotal, selfPaidTotal + fundPrepaid);
+    const displayCollected = selfCovered + collectOnlyTotal;
 
     return {
       memberId,
