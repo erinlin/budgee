@@ -81,34 +81,43 @@ export const Collections: React.FC = () => {
                 <tr>
                   <th>成員</th>
                   <th className="text-right">分攤</th>
-                  {hasFund && <th className="text-right">公費</th>}
                   <th className="text-right">代墊</th>
                   <th className="text-right">已收</th>
                   <th className="text-right">餘額</th>
+                  {hasFund && <th className="text-right">公費餘額</th>}
                 </tr>
               </thead>
               <tbody>
                 {balances.map(b => (
                   <tr key={b.memberId}>
                     <td className="font-semibold">{getMemberName(b.memberId)}</td>
-                    <td className="text-right">{fmt(b.splitTotal)}</td>
-                    {hasFund && <td className="text-right">{fmt(b.fundPrepaid)}</td>}
+                    <td className="text-right">
+                      {fmt(b.splitTotal)}
+                      {hasFund && b.fundExpenseShare > 0 && (
+                        <div style={{ color: '#2e7d32', fontSize: '0.9em' }}>{fmt(b.fundExpenseShare)}</div>
+                      )}
+                    </td>
                     <td className="text-right">{fmt(b.paidTotal)}</td>
-                    <td className="text-right">{fmt(b.displayCollected)}</td>
+                    <td className="text-right">{fmt(b.collectedTotal)}</td>
                     <td className="text-right">
                       <AmountDisplay amount={b.balance} />
-                      {hasFund && b.fundNet > 0 && b.balance > 0 && (
+                      {hasFund && b.fundPrepaid > 0 && Math.round(b.balance) > 0 && (
                         <span style={{ color: 'var(--text-muted)', fontSize: '0.85em', marginLeft: 4 }}>
-                          (含公費{fmt(b.fundNet)})
+                          (含公費{fmt(b.fundPrepaid)})
                         </span>
                       )}
                     </td>
+                    {hasFund && (
+                      <td className="text-right">
+                        <AmountDisplay amount={b.fundBalance} />
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
             </table>
             <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>
-              正值（紅）= 尚欠繳｜負值（綠）= 待退款
+              正值（紅）= 尚欠繳｜負值（綠）= 待退款{hasFund ? '｜公費餘額負值 = 可退' : ''}
             </p>
           </div>
         )}
@@ -140,7 +149,7 @@ export const Collections: React.FC = () => {
                     if (selected) {
                       const b = balances.find(b => b.memberId === selected);
                       const bal = b?.balance ?? 0;
-                      const fundNote = b && b.fundNet > 0 && bal > 0 ? `含公費 ${fmt(b.fundNet)}` : '';
+                      const fundNote = b && b.fundPrepaid > 0 && bal > 0 ? `含公費 ${fmt(b.fundPrepaid)}` : '';
                       if (bal > 0) {
                         setAmount(String(Math.round(bal)));
                         setCollType('collect');

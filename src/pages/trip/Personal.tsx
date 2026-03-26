@@ -84,7 +84,7 @@ export const Personal: React.FC = () => {
                 </div>
                 <div className="balance-summary-item">
                   <span className="label">已收總計</span>
-                  <span className="value">{fmt(balance.displayCollected)}</span>
+                  <span className="value">{fmt(balance.collectedTotal)}</span>
                 </div>
                 <div className="balance-summary-item final">
                   <span className="label">最終</span>
@@ -111,9 +111,11 @@ export const Personal: React.FC = () => {
                   <span className="value">{fmt(balance.fundExpenseShare)}</span>
                 </div>
                 <div className="balance-summary-item final">
-                  <span className="label">公費剩餘</span>
-                  <span className="value">{fmt(balance.fundNet)}</span>
-                  <span className="hint">已反映在總餘額中</span>
+                  <span className="label">公費餘額</span>
+                  <AmountDisplay amount={balance.fundBalance} />
+                  <span className="hint">
+                    {Math.round(balance.fundBalance) < 0 ? '（可退）' : Math.round(balance.fundBalance) > 0 ? '（需補繳）' : '（已用完）'}
+                  </span>
                 </div>
               </div>
             </section>

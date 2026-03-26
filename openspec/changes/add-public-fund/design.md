@@ -41,17 +41,18 @@ Budgee 目前的花費模型只有 `split`（均攤）和 `per-item`（選項型
 **替代方案**: 用 `title` 字串判斷（如「預收公費」開頭）。
 **為何不選**: 字串比對脆弱，使用者可能修改標題。結構化欄位更可靠。
 
-### D3: 公費餘額獨立計算，不混入一般餘額
+### D3: 公費納入統一餘額，公費餘額獨立顯示
 
 **選擇**: `MemberBalance` 新增 `fundPrepaid`（預繳總額）、`fundExpenseShare`（公費支出分攤）、`fundBalance`（公費餘額 = 公費支出分攤 - 預繳總額）三個欄位。
 
 計算邏輯：
+- `splitTotal`: 一般分攤（不含公費支出）
 - `fundPrepaid`: 加總該成員在所有 `fundSubType: 'pre-collect'` 花費中的 split amount
 - `fundExpenseShare`: 加總該成員在所有 `fundSubType: 'expense'` 花費中的 split amount
-- `fundBalance = fundExpenseShare - fundPrepaid`（正數=需補繳，負數=可退）
-- 一般的 `splitTotal` / `balance` 計算排除 `category: 'public-fund'` 的花費
+- `balance = (splitTotal + fundPrepaid) - paidTotal - collectedTotal`（公費支出不影響餘額，從公費池出）
+- `fundBalance = fundExpenseShare - fundPrepaid`（負數=公費池有剩餘可退，正數=需補繳）
 
-**關鍵**: 公費花費不進入一般餘額計算，完全獨立。
+**關鍵**: 餘額包含預收公費但不含公費支出（公費支出從公費池扣，不影響個人應繳）。公費餘額獨立追蹤公費池使用狀態。
 
 ### D4: 「從公費支出」的分攤成員 = 所有有預收紀錄的成員
 
@@ -65,11 +66,11 @@ Budgee 目前的花費模型只有 `split`（均攤）和 `per-item`（選項型
 
 ### D6: 餘額總表欄位配置
 
-顯示方式：`成員 | 分攤 | 公費 | 代墊 | 已收 | 餘額(公費)`
+顯示方式：`成員 | 分攤 | 代墊 | 已收 | 餘額 | 公費餘額`
 
-- 「公費」欄：顯示 `fundPrepaid`（預繳金額）
-- 「餘額」欄：顯示一般餘額，括號內顯示公費餘額，如 `1,000(-500)`
-- 公費欄位僅在旅程中有任何 `fundSubType: 'pre-collect'` 花費時才顯示
+- 「分攤」欄：第一行顯示一般分攤，第二行深綠色顯示公費支出分攤（有公費支出時才顯示）
+- 「餘額」欄：含預收公費的統一餘額，有含公費時標注如 `1,500(含公費500)`
+- 「公費餘額」欄：顯示 `fundBalance`（負數=可退，正數=需補繳），僅在有預收公費時顯示
 
 ### D7: pdfExport 的 calcBalances 同步策略
 
