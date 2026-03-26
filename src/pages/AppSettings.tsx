@@ -22,6 +22,7 @@ const CATEGORY_LABELS: Record<ExpenseCategory, string> = {
   'split': '平均均攤',
   'per-item': '選項型',
   'general': '通用',
+  'public-fund': '公費',
 };
 
 export const AppSettings: React.FC = () => {
