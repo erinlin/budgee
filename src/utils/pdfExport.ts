@@ -43,16 +43,17 @@ export async function exportTripAsPdf(tripId: string): Promise<void> {
     const roundedBalance = Math.round(b.balance);
     const balanceLabel = roundedBalance > 0 ? '待繳' : roundedBalance < 0 ? '待退' : '結清';
     const balanceClass = roundedBalance > 0 ? 'owe' : roundedBalance < 0 ? 'refund' : '';
-    const fundSuffix = hasFund && b.fundPrepaid > 0 && roundedBalance !== 0 ? `(含公費${fmt(b.fundPrepaid)})` : '';
+
     const roundedFundBalance = Math.round(b.fundBalance);
     const fundBalanceClass = roundedFundBalance > 0 ? 'owe' : roundedFundBalance < 0 ? 'refund' : '';
     return `
       <tr>
         <td>${b.name}</td>
         <td class="num">${fmt(b.splitTotal)}${hasFund && b.fundExpenseShare > 0 ? `<br><span style="color:#2e7d32">${fmt(b.fundExpenseShare)}</span>` : ''}</td>
+        ${hasFund ? `<td class="num">${fmt(b.fundPrepaid)}</td>` : ''}
         <td class="num">${fmt(b.paidTotal)}</td>
         <td class="num">${fmt(b.collectedTotal)}</td>
-        <td class="num ${balanceClass}">${fmt(Math.abs(b.balance))}（${balanceLabel}）${fundSuffix}</td>
+        <td class="num ${balanceClass}">${fmt(Math.abs(b.balance))}（${balanceLabel}）</td>
         ${hasFund ? `<td class="num ${fundBalanceClass}">${fmt(b.fundBalance)}</td>` : ''}
       </tr>`;
   }).join('');
@@ -95,8 +96,8 @@ export async function exportTripAsPdf(tripId: string): Promise<void> {
 
   <h2>每人餘額摘要</h2>
   <table>
-    <thead><tr><th>旅伴</th><th style="text-align:right">分攤</th><th style="text-align:right">代墊</th><th style="text-align:right">已收</th><th style="text-align:right">餘額</th>${hasFund ? '<th style="text-align:right">公費餘額</th>' : ''}</tr></thead>
-    <tbody>${balanceRows || `<tr><td colspan="${hasFund ? 6 : 5}" style="text-align:center;color:#999">尚無成員</td></tr>`}</tbody>
+    <thead><tr><th>旅伴</th><th style="text-align:right">分攤${hasFund ? '<br><span style="font-size:0.85em;font-weight:400">公費分攤</span>' : ''}</th>${hasFund ? '<th style="text-align:right">公費</th>' : ''}<th style="text-align:right">代墊</th><th style="text-align:right">已收</th><th style="text-align:right">餘額</th>${hasFund ? '<th style="text-align:right">公費餘額</th>' : ''}</tr></thead>
+    <tbody>${balanceRows || `<tr><td colspan="${hasFund ? 7 : 5}" style="text-align:center;color:#999">尚無成員</td></tr>`}</tbody>
   </table>
 
   <footer>Budgee｜${trip.title}｜匯出於 ${new Date().toLocaleDateString('zh-TW')}</footer>

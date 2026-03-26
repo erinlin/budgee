@@ -80,7 +80,8 @@ export const Collections: React.FC = () => {
               <thead>
                 <tr>
                   <th>成員</th>
-                  <th className="text-right">分攤</th>
+                  <th className="text-right">分攤{hasFund && <><br /><span style={{ fontSize: '0.85em', fontWeight: 400 }}>公費分攤</span></>}</th>
+                  {hasFund && <th className="text-right">公費</th>}
                   <th className="text-right">代墊</th>
                   <th className="text-right">已收</th>
                   <th className="text-right">餘額</th>
@@ -97,15 +98,11 @@ export const Collections: React.FC = () => {
                         <div style={{ color: '#2e7d32', fontSize: '0.9em' }}>{fmt(b.fundExpenseShare)}</div>
                       )}
                     </td>
+                    {hasFund && <td className="text-right">{fmt(b.fundPrepaid)}</td>}
                     <td className="text-right">{fmt(b.paidTotal)}</td>
                     <td className="text-right">{fmt(b.collectedTotal)}</td>
                     <td className="text-right">
                       <AmountDisplay amount={b.balance} />
-                      {hasFund && b.fundPrepaid > 0 && Math.round(b.balance) > 0 && (
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85em', marginLeft: 4 }}>
-                          (含公費{fmt(b.fundPrepaid)})
-                        </span>
-                      )}
                     </td>
                     {hasFund && (
                       <td className="text-right">
@@ -149,15 +146,14 @@ export const Collections: React.FC = () => {
                     if (selected) {
                       const b = balances.find(b => b.memberId === selected);
                       const bal = b?.balance ?? 0;
-                      const fundNote = b && b.fundPrepaid > 0 && bal > 0 ? `含公費 ${fmt(b.fundPrepaid)}` : '';
                       if (bal > 0) {
                         setAmount(String(Math.round(bal)));
                         setCollType('collect');
-                        setNote(fundNote);
+                        setNote('');
                       } else if (bal < 0) {
                         setAmount(String(Math.round(Math.abs(bal))));
                         setCollType('payout');
-                        setNote('退款');
+                        setNote('');
                       } else {
                         setAmount('');
                         setCollType('collect');
