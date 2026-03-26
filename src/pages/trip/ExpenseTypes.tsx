@@ -14,6 +14,7 @@ interface TypeFormData {
   name: string;
   category: ExpenseCategory;
   options: ExpenseOption[];
+  fundSubType?: 'pre-collect' | 'expense';
 }
 
 const emptyForm = (): TypeFormData => ({ name: '', category: 'split', options: [] });
@@ -22,6 +23,12 @@ const CATEGORY_LABELS: Record<ExpenseCategory, string> = {
   'split': '平均均攤',
   'per-item': '選項型',
   'general': '通用',
+  'public-fund': '公費',
+};
+
+const FUND_SUB_TYPE_LABELS: Record<string, string> = {
+  'pre-collect': '預收公費',
+  'expense': '從公費支出',
 };
 
 export const ExpenseTypes: React.FC = () => {
@@ -70,14 +77,19 @@ export const ExpenseTypes: React.FC = () => {
     setFormError('');
 
     const editingType = editingId ? activeTrip.expenseTypes.find(t => t.id === editingId) : null;
+    if (formData.category === 'public-fund' && !formData.fundSubType) {
+      setFormError('請選擇公費子類型');
+      return;
+    }
     const typeData = {
       name: formData.name.trim(),
       category: formData.category,
       defaultAll: editingType?.defaultAll ?? false,
       builtIn: editingType?.builtIn ?? false,
-      options: formData.category !== 'split' && formData.options.length > 0
+      options: formData.category !== 'split' && formData.category !== 'public-fund' && formData.options.length > 0
         ? formData.options
         : undefined,
+      fundSubType: formData.category === 'public-fund' ? formData.fundSubType : undefined,
     };
 
     if (editingId) {
@@ -93,7 +105,7 @@ export const ExpenseTypes: React.FC = () => {
   const handleEditClick = (typeId: string) => {
     const type = activeTrip.expenseTypes.find((t) => t.id === typeId);
     if (!type) return;
-    setFormData({ name: type.name, category: type.category, options: type.options ?? [] });
+    setFormData({ name: type.name, category: type.category, options: type.options ?? [], fundSubType: type.fundSubType });
     setEditingId(typeId);
     setShowAddForm(false);
   };
@@ -141,10 +153,27 @@ export const ExpenseTypes: React.FC = () => {
             <option value="split">平均均攤（split）</option>
             <option value="per-item">選項型（per-item）</option>
             <option value="general">通用（general）</option>
+            <option value="public-fund">公費（public-fund）</option>
           </select>
         </div>
 
-        {formData.category !== 'split' && (
+        {formData.category === 'public-fund' && (
+          <div>
+            <Label htmlFor="type-fund-sub">公費子類型</Label>
+            <select
+              id="type-fund-sub"
+              className="budgee-input cursor-pointer"
+              value={formData.fundSubType ?? ''}
+              onChange={(e) => setFormData((prev) => ({ ...prev, fundSubType: e.target.value as 'pre-collect' | 'expense' }))}
+            >
+              <option value="">請選擇</option>
+              <option value="pre-collect">預收公費</option>
+              <option value="expense">從公費支出</option>
+            </select>
+          </div>
+        )}
+
+        {formData.category !== 'split' && formData.category !== 'public-fund' && (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--spacing-sm)' }}>
               <Label style={{ margin: 0 }}>品項選項</Label>
@@ -218,7 +247,9 @@ export const ExpenseTypes: React.FC = () => {
                   <span className="font-semibold text-xl">{type.name}</span>
                   <span className="budgee-badge badge-secondary" style={{ fontSize: '0.75em' }}>內建</span>
                   <span style={{ color: 'var(--text-muted)', fontSize: '0.9em' }}>
-                    {CATEGORY_LABELS[type.category]}
+                    {type.category === 'public-fund' && type.fundSubType
+                      ? FUND_SUB_TYPE_LABELS[type.fundSubType]
+                      : CATEGORY_LABELS[type.category]}
                     {type.defaultAll && '・預設全員'}
                   </span>
                 </div>
@@ -275,7 +306,11 @@ export const ExpenseTypes: React.FC = () => {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     <span className="font-semibold text-xl">{type.name}</span>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '0.9em' }}>{CATEGORY_LABELS[type.category]}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '0.9em' }}>
+                      {type.category === 'public-fund' && type.fundSubType
+                        ? FUND_SUB_TYPE_LABELS[type.fundSubType]
+                        : CATEGORY_LABELS[type.category]}
+                    </span>
                   </div>
                   {type.options && type.options.length > 0 && (
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 6 }}>

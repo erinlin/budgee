@@ -21,6 +21,7 @@ export interface ExpenseType {
   defaultAll: boolean;
   builtIn: boolean;
   options?: ExpenseOption[];
+  fundSubType?: 'pre-collect' | 'expense';
 }
 
 export interface Trip {

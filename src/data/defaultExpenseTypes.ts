@@ -58,5 +58,21 @@ export function createDefaultExpenseTypes(): ExpenseType[] {
         { id: uuidv4(), label: '敬老票', price: 0 },
       ],
     },
+    {
+      id: uuidv4(),
+      name: '預收公費',
+      category: 'public-fund',
+      defaultAll: true,
+      builtIn: true,
+      fundSubType: 'pre-collect',
+    },
+    {
+      id: uuidv4(),
+      name: '從公費支出',
+      category: 'public-fund',
+      defaultAll: false,
+      builtIn: true,
+      fundSubType: 'expense',
+    },
   ];
 }

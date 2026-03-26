@@ -97,6 +97,28 @@ export const Personal: React.FC = () => {
             </section>
           )}
 
+          {/* 公費摘要 */}
+          {balance && balance.fundPrepaid > 0 && (
+            <section className="balance-summary-card">
+              <h2 className="section-title">公費摘要</h2>
+              <div className="balance-summary-grid">
+                <div className="balance-summary-item">
+                  <span className="label">預收公費</span>
+                  <span className="value">{fmt(balance.fundPrepaid)}</span>
+                </div>
+                <div className="balance-summary-item">
+                  <span className="label">公費支出分攤</span>
+                  <span className="value">{fmt(balance.fundExpenseShare)}</span>
+                </div>
+                <div className="balance-summary-item final">
+                  <span className="label">公費剩餘</span>
+                  <span className="value">{fmt(balance.fundNet)}</span>
+                  <span className="hint">已反映在總餘額中</span>
+                </div>
+              </div>
+            </section>
+          )}
+
           {/* 花費分攤明細 */}
           <section>
             <h2 className="section-title">花費分攤明細</h2>

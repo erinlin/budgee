@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import type { Trip, ExpenseOption, Split } from '../../types';
 import { Button } from '../ui/Button';
@@ -6,7 +6,8 @@ import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
 import { calcSplitAmounts, calcPerItemAmounts } from '../../stores/expenseStore';
 import { fmt } from '../../utils/fmt';
-import { X, CheckSquare, Square, Plus, Trash2 } from 'lucide-react';
+import { X, CheckSquare, Square, Plus, Trash2, AlertCircle } from 'lucide-react';
+import { db } from '../../db';
 
 interface InlineOption {
   id: string;
@@ -15,13 +16,14 @@ interface InlineOption {
 }
 
 export interface ExpenseFormData {
-  category: 'split' | 'per-item';
+  category: 'split' | 'per-item' | 'public-fund';
   title: string;
   date: string;
   totalAmount: number;
   paidBy: string | null;
   options?: ExpenseOption[];
   splits: Split[];
+  fundSubType?: 'pre-collect' | 'expense';
 }
 
 interface ExpenseFormProps {
@@ -40,12 +42,35 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ trip, initialData, onS
     return d;
   };
 
-  const [category, setCategory] = useState<'split' | 'per-item'>(initialData?.category ?? 'split');
+  const [category, setCategory] = useState<'split' | 'per-item' | 'public-fund'>(initialData?.category ?? 'split');
   const [title, setTitle] = useState(initialData?.title ?? '');
   const [date, setDate] = useState(initialData?.date ?? clampDate(today));
   const [paidBy, setPaidBy] = useState<string | null>(initialData?.paidBy ?? null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  // 公費模式狀態
+  const [fundSubType, setFundSubType] = useState<'pre-collect' | 'expense'>(initialData?.fundSubType ?? 'pre-collect');
+  const [fundAmount, setFundAmount] = useState(
+    initialData?.category === 'public-fund' && initialData.fundSubType === 'pre-collect'
+      ? (initialData.splits?.[0]?.amount?.toString() ?? '')
+      : (initialData?.category === 'public-fund' ? initialData.totalAmount?.toString() ?? '' : '')
+  );
+  const [fundMembers, setFundMembers] = useState<string[]>(
+    initialData?.category === 'public-fund' ? (initialData.splits?.map(s => s.memberId) ?? []) : []
+  );
+  const [preCollectMemberIds, setPreCollectMemberIds] = useState<string[]>([]);
+
+  // 載入有預收公費紀錄的成員 IDs
+  useEffect(() => {
+    if (!trip.id) return;
+    db.expenses.where({ tripId: trip.id }).toArray().then(exps => {
+      const ids = new Set<string>();
+      exps.filter(e => e.category === 'public-fund' && e.fundSubType === 'pre-collect')
+        .forEach(e => e.splits.forEach(s => ids.add(s.memberId)));
+      setPreCollectMemberIds(Array.from(ids));
+    });
+  }, [trip.id]);
 
   // 分攤型狀態
   const [splitTotal, setSplitTotal] = useState(
@@ -72,15 +97,19 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ trip, initialData, onS
   });
 
   // 切換模式時重設相關狀態
-  const handleCategoryChange = (cat: 'split' | 'per-item') => {
+  const handleCategoryChange = (cat: 'split' | 'per-item' | 'public-fund') => {
     setCategory(cat);
     setError('');
     if (cat === 'per-item') {
       setOptions([{ id: uuidv4(), label: '', price: '' }]);
       setMemberOptions({});
-    } else {
+    } else if (cat === 'split') {
       setSelectedMembers([]);
       setSplitTotal('');
+    } else {
+      setFundSubType('pre-collect');
+      setFundAmount('');
+      setFundMembers([]);
     }
   };
 
@@ -137,7 +166,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ trip, initialData, onS
       if (selectedMembers.length === 0) { setError('請至少選擇一位分攤成員'); return; }
       totalAmount = amount;
       splits = calcSplitAmounts(amount, selectedMembers);
-    } else {
+    } else if (category === 'per-item') {
       const validOpts = options.filter(o => o.label.trim() && o.price !== '');
       if (validOpts.length === 0) { setError('請至少新增一個選項（填入名稱與價格）'); return; }
 
@@ -159,13 +188,31 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ trip, initialData, onS
       const result = calcPerItemAmounts(map);
       splits = result.splits;
       totalAmount = result.totalAmount;
+    } else {
+      // public-fund
+      const amount = parseFloat(fundAmount);
+      if (isNaN(amount) || amount <= 0) { setError('請輸入有效金額'); return; }
+
+      if (fundSubType === 'pre-collect') {
+        if (fundMembers.length === 0) { setError('請至少選擇一位成員'); return; }
+        // 每人繳交統一金額
+        splits = fundMembers.map(memberId => ({ memberId, amount }));
+        totalAmount = amount * fundMembers.length;
+      } else {
+        // expense: 自動均攤給有預收紀錄的成員
+        if (preCollectMemberIds.length === 0) { setError('尚無預收公費紀錄，請先建立預收公費'); return; }
+        totalAmount = amount;
+        splits = calcSplitAmounts(amount, preCollectMemberIds);
+      }
     }
 
     if (totalAmount <= 0) { setError('總金額必須大於 0'); return; }
 
     try {
       setSubmitting(true);
-      await onSubmit({ category, title, date, totalAmount, paidBy, options: finalOptions, splits });
+      const fundData = category === 'public-fund' ? { fundSubType } : {};
+      const submitPaidBy = category === 'public-fund' ? null : paidBy;
+      await onSubmit({ category, title, date, totalAmount, paidBy: submitPaidBy, options: finalOptions, splits, ...fundData });
     } catch {
       setError('儲存失敗，請重試');
       setSubmitting(false);
@@ -198,6 +245,13 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ trip, initialData, onS
               onClick={() => handleCategoryChange('per-item')}
             >
               選項型
+            </button>
+            <button
+              type="button"
+              className={`category-toggle-btn${category === 'public-fund' ? ' active' : ''}`}
+              onClick={() => handleCategoryChange('public-fund')}
+            >
+              公費
             </button>
           </div>
 
@@ -392,7 +446,110 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ trip, initialData, onS
             </>
           )}
 
+          {/* ── 公費 ── */}
+          {category === 'public-fund' && (
+            <>
+              <div className="category-toggle" style={{ marginTop: 0 }}>
+                <button
+                  type="button"
+                  className={`category-toggle-btn${fundSubType === 'pre-collect' ? ' active' : ''}`}
+                  onClick={() => { setFundSubType('pre-collect'); setFundAmount(''); setError(''); }}
+                >
+                  預收公費
+                </button>
+                <button
+                  type="button"
+                  className={`category-toggle-btn${fundSubType === 'expense' ? ' active' : ''}`}
+                  onClick={() => { setFundSubType('expense'); setFundAmount(''); setError(''); }}
+                >
+                  從公費支出
+                </button>
+              </div>
+
+              {fundSubType === 'expense' && preCollectMemberIds.length === 0 && (
+                <div className="flex items-center gap-2 text-base font-medium" style={{ color: 'var(--color-danger)' }}>
+                  <AlertCircle size={18} />
+                  <span>尚無預收公費紀錄，請先建立預收公費</span>
+                </div>
+              )}
+
+              <div>
+                <Label htmlFor="fund-amount">
+                  {fundSubType === 'pre-collect' ? '每人繳交金額' : '支出金額'}
+                </Label>
+                <Input
+                  id="fund-amount"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={fundAmount}
+                  onChange={e => setFundAmount(e.target.value)}
+                  placeholder="0"
+                />
+              </div>
+
+              {fundSubType === 'pre-collect' && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <Label>繳費成員</Label>
+                    <button
+                      type="button"
+                      className="flex items-center gap-1 text-sm"
+                      style={{ color: 'var(--color-primary)', border: '1.5px solid var(--color-primary)', borderRadius: 'var(--radius-md)', padding: '4px 10px', background: 'transparent' }}
+                      onClick={() => setFundMembers(prev => prev.length === trip.members.length ? [] : trip.members.map(m => m.id))}
+                    >
+                      {fundMembers.length === trip.members.length
+                        ? <><CheckSquare size={18} /> 取消全選</>
+                        : <><Square size={18} /> 全選</>
+                      }
+                    </button>
+                  </div>
+                  <div className="member-checkbox-grid">
+                    {trip.members.map(m => {
+                      const checked = fundMembers.includes(m.id);
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          className={`member-checkbox-item${checked ? ' selected' : ''}`}
+                          onClick={() => setFundMembers(prev => prev.includes(m.id) ? prev.filter(id => id !== m.id) : [...prev, m.id])}
+                          aria-pressed={checked}
+                        >
+                          <span className="member-checkbox-icon">
+                            {checked ? <CheckSquare size={20} /> : <Square size={20} />}
+                          </span>
+                          {m.nickname}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {fundMembers.length > 0 && parseFloat(fundAmount) > 0 && (
+                    <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>
+                      {fundMembers.length} 人，合計 {fmt(parseFloat(fundAmount) * fundMembers.length)}
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {fundSubType === 'expense' && preCollectMemberIds.length > 0 && (
+                <div>
+                  <Label>分攤成員（自動帶入）</Label>
+                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                    {preCollectMemberIds.map(mid => trip.members.find(m => m.id === mid)?.nickname ?? '').filter(Boolean).join('、')}
+                    （{preCollectMemberIds.length} 人）
+                  </p>
+                  {parseFloat(fundAmount) > 0 && (
+                    <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                      每人約 {fmt(Math.ceil(parseFloat(fundAmount) / preCollectMemberIds.length))}
+                    </p>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
           {/* 代墊人 */}
+          {category !== 'public-fund' && (
           <div>
             <Label htmlFor="paid-by">代墊人</Label>
             <select
@@ -407,6 +564,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({ trip, initialData, onS
               ))}
             </select>
           </div>
+          )}
 
           {error && (
             <p role="alert" className="text-base font-medium" style={{ color: 'var(--color-danger)' }}>

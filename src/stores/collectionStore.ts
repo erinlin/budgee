@@ -1,16 +1,20 @@
 import { create } from 'zustand';
 import { db } from '../db';
-import type { Collection, Expense } from '../types';
+import type { Collection } from '../types';
 import { v4 as uuidv4 } from 'uuid';
+import { calcBalances as calcBalancesUtil } from '../utils/balanceCalc';
 
 export interface MemberBalance {
   memberId: string;
-  splitTotal: number;     // 分攤總額（應繳）
-  paidTotal: number;      // 代墊總額（含自身份額）
+  splitTotal: number;     // 分攤總額（應繳，排除公費）
+  paidTotal: number;      // 代墊總額（含自身份額，排除公費）
   selfPaidTotal: number;  // 代墊中屬於自己的份額（自動列為已收）
   collectedTotal: number; // 手動收款總額
   displayCollected: number; // 顯示用已收 = selfPaidTotal + collectedTotal
-  balance: number;        // splitTotal - paidTotal - collectedTotal（正=應繳，負=待退）
+  balance: number;        // (splitTotal + fundNet) - paidTotal - collectedTotal（正=應繳，負=待退）
+  fundPrepaid: number;    // 預收公費總額（應收）
+  fundExpenseShare: number; // 公費支出分攤總額
+  fundNet: number;        // fundPrepaid - fundExpenseShare（正=公費剩餘，負=公費不足）
 }
 
 interface CollectionState {
@@ -53,40 +57,8 @@ export const useCollectionStore = create<CollectionState>((set, get) => ({
   },
 
   calcBalances: async (tripId, memberIds) => {
-    const expenses: Expense[] = await db.expenses.where({ tripId }).toArray();
+    const expenses = await db.expenses.where({ tripId }).toArray();
     const collections: Collection[] = await db.collections.where({ tripId }).toArray();
-
-    return memberIds.map(memberId => {
-      const splitTotal = expenses.reduce((sum, exp) => {
-        const split = exp.splits.find(s => s.memberId === memberId);
-        return sum + (split?.amount ?? 0);
-      }, 0);
-
-      const paidTotal = expenses.reduce((sum, exp) => {
-        return exp.paidBy === memberId ? sum + exp.totalAmount : sum;
-      }, 0);
-
-      // 代墊者自身的分攤份額（代墊時視為已自付）
-      const selfPaidTotal = expenses.reduce((sum, exp) => {
-        if (exp.paidBy !== memberId) return sum;
-        const split = exp.splits.find(s => s.memberId === memberId);
-        return sum + (split?.amount ?? 0);
-      }, 0);
-
-      // collect 類型：正向收款；payout 類型：退款給代墊人（反向，加回 balance）
-      const collectOnlyTotal = collections
-        .filter(c => c.memberId === memberId && c.type !== 'payout')
-        .reduce((sum, c) => sum + c.amount, 0);
-
-      const payoutTotal = collections
-        .filter(c => c.memberId === memberId && c.type === 'payout')
-        .reduce((sum, c) => sum + c.amount, 0);
-
-      const collectedTotal = collectOnlyTotal - payoutTotal;
-      const displayCollected = selfPaidTotal + collectOnlyTotal; // 顯示用，不含退款扣減
-      const balance = splitTotal - paidTotal - collectedTotal;
-
-      return { memberId, splitTotal, paidTotal, selfPaidTotal, collectedTotal, displayCollected, balance };
-    });
+    return calcBalancesUtil(memberIds, expenses, collections);
   },
 }));

@@ -19,7 +19,8 @@ import { Plus, Trash2, Edit2, ChevronDown, ChevronUp, Receipt } from 'lucide-rea
 
 const formatDate = (d: string) => d.slice(5).replace('-', '/');
 
-function getMemberName(trip: Trip, memberId: string | null): string {
+function getMemberName(trip: Trip, memberId: string | null, expense?: Expense): string {
+  if (expense?.category === 'public-fund') return '公費';
   if (!memberId) return '無代墊';
   return trip.members.find(m => m.id === memberId)?.nickname ?? '未知';
 }
@@ -76,7 +77,7 @@ export const Expenses: React.FC = () => {
     {
       id: 'paidBy',
       header: '代墊人',
-      accessorFn: (row) => getMemberName(trip, row.paidBy),
+      accessorFn: (row) => getMemberName(trip, row.paidBy, row),
     },
     {
       id: 'splits',
@@ -250,6 +251,7 @@ export const Expenses: React.FC = () => {
             paidBy: editingExpense.paidBy,
             options: editingExpense.options,
             splits: editingExpense.splits,
+            fundSubType: editingExpense.fundSubType,
           } : undefined}
           onSubmit={handleSubmit}
           onClose={() => { setShowForm(false); setEditingExpense(null); }}

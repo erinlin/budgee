@@ -1,47 +1,11 @@
-import type { Trip, Expense, Collection } from '../types';
+import type { Trip } from '../types';
 import { fmt } from './fmt';
 import { db } from '../db';
+import { calcBalances } from './balanceCalc';
 
 function getMemberName(trip: Trip, memberId: string | null): string {
   if (!memberId) return '無代墊';
   return trip.members.find(m => m.id === memberId)?.nickname ?? '未知';
-}
-
-function calcBalances(
-  trip: Trip,
-  expenses: Expense[],
-  collections: Collection[]
-): Array<{ name: string; splitTotal: number; paidTotal: number; displayCollected: number; balance: number }> {
-  return trip.members.map(member => {
-    const splitTotal = expenses.reduce((sum, exp) => {
-      const split = exp.splits.find(s => s.memberId === member.id);
-      return sum + (split?.amount ?? 0);
-    }, 0);
-
-    const paidTotal = expenses.reduce((sum, exp) => {
-      return exp.paidBy === member.id ? sum + exp.totalAmount : sum;
-    }, 0);
-
-    const selfPaidTotal = expenses.reduce((sum, exp) => {
-      if (exp.paidBy !== member.id) return sum;
-      const split = exp.splits.find(s => s.memberId === member.id);
-      return sum + (split?.amount ?? 0);
-    }, 0);
-
-    const collectOnlyTotal = collections
-      .filter(c => c.memberId === member.id && c.type !== 'payout')
-      .reduce((sum, c) => sum + c.amount, 0);
-
-    const payoutTotal = collections
-      .filter(c => c.memberId === member.id && c.type === 'payout')
-      .reduce((sum, c) => sum + c.amount, 0);
-
-    const collectedTotal = collectOnlyTotal - payoutTotal;
-    const displayCollected = selfPaidTotal + collectOnlyTotal;
-    const balance = splitTotal - paidTotal - collectedTotal;
-
-    return { name: member.nickname, splitTotal, paidTotal, displayCollected, balance };
-  });
 }
 
 export async function exportTripAsPdf(tripId: string): Promise<void> {
@@ -50,12 +14,18 @@ export async function exportTripAsPdf(tripId: string): Promise<void> {
 
   const expenses = await db.expenses.where({ tripId }).sortBy('date');
   const collections = await db.collections.where({ tripId }).toArray();
-  const balances = calcBalances(trip, expenses, collections);
+  const memberIds = trip.members.map(m => m.id);
+  const rawBalances = calcBalances(memberIds, expenses, collections);
+  const hasFund = rawBalances.some(b => b.fundPrepaid > 0);
+  const balances = rawBalances.map((b, i) => ({
+    ...b,
+    name: trip.members[i].nickname,
+  }));
 
   const formatDate = (d: string) => d.slice(5).replace('-', '/');
 
   const expenseRows = expenses.map(exp => {
-    const paidBy = getMemberName(trip, exp.paidBy);
+    const paidBy = exp.category === 'public-fund' ? '公費' : getMemberName(trip, exp.paidBy);
     const splitMembers = exp.splits.map(s =>
       trip.members.find(m => m.id === s.memberId)?.nickname ?? ''
     ).filter(Boolean).join('、');
@@ -73,13 +43,15 @@ export async function exportTripAsPdf(tripId: string): Promise<void> {
     const roundedBalance = Math.round(b.balance);
     const balanceLabel = roundedBalance > 0 ? '待繳' : roundedBalance < 0 ? '待退' : '結清';
     const balanceClass = roundedBalance > 0 ? 'owe' : roundedBalance < 0 ? 'refund' : '';
+    const fundSuffix = hasFund && b.fundNet > 0 && roundedBalance > 0 ? `(含公費${fmt(b.fundNet)})` : '';
     return `
       <tr>
         <td>${b.name}</td>
         <td class="num">${fmt(b.splitTotal)}</td>
+        ${hasFund ? `<td class="num">${fmt(b.fundPrepaid)}</td>` : ''}
         <td class="num">${fmt(b.paidTotal)}</td>
         <td class="num">${fmt(b.displayCollected)}</td>
-        <td class="num ${balanceClass}">${fmt(Math.abs(b.balance))}（${balanceLabel}）</td>
+        <td class="num ${balanceClass}">${fmt(Math.abs(b.balance))}（${balanceLabel}）${fundSuffix}</td>
       </tr>`;
   }).join('');
 
@@ -121,8 +93,8 @@ export async function exportTripAsPdf(tripId: string): Promise<void> {
 
   <h2>每人餘額摘要</h2>
   <table>
-    <thead><tr><th>旅伴</th><th style="text-align:right">分攤</th><th style="text-align:right">代墊</th><th style="text-align:right">已收</th><th style="text-align:right">餘額</th></tr></thead>
-    <tbody>${balanceRows || '<tr><td colspan="5" style="text-align:center;color:#999">尚無成員</td></tr>'}</tbody>
+    <thead><tr><th>旅伴</th><th style="text-align:right">分攤</th>${hasFund ? '<th style="text-align:right">公費</th>' : ''}<th style="text-align:right">代墊</th><th style="text-align:right">已收</th><th style="text-align:right">餘額</th></tr></thead>
+    <tbody>${balanceRows || `<tr><td colspan="${hasFund ? 6 : 5}" style="text-align:center;color:#999">尚無成員</td></tr>`}</tbody>
   </table>
 
   <footer>Budgee｜${trip.title}｜匯出於 ${new Date().toLocaleDateString('zh-TW')}</footer>

@@ -42,6 +42,7 @@ export const Collections: React.FC = () => {
 
   const trip = activeTrip;
   const isArchived = trip.archived;
+  const hasFund = balances.some(b => b.fundPrepaid > 0);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,6 +81,7 @@ export const Collections: React.FC = () => {
                 <tr>
                   <th>成員</th>
                   <th className="text-right">分攤</th>
+                  {hasFund && <th className="text-right">公費</th>}
                   <th className="text-right">代墊</th>
                   <th className="text-right">已收</th>
                   <th className="text-right">餘額</th>
@@ -90,10 +92,16 @@ export const Collections: React.FC = () => {
                   <tr key={b.memberId}>
                     <td className="font-semibold">{getMemberName(b.memberId)}</td>
                     <td className="text-right">{fmt(b.splitTotal)}</td>
+                    {hasFund && <td className="text-right">{fmt(b.fundPrepaid)}</td>}
                     <td className="text-right">{fmt(b.paidTotal)}</td>
                     <td className="text-right">{fmt(b.displayCollected)}</td>
                     <td className="text-right">
                       <AmountDisplay amount={b.balance} />
+                      {hasFund && b.fundNet > 0 && b.balance > 0 && (
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.85em', marginLeft: 4 }}>
+                          (含公費{fmt(b.fundNet)})
+                        </span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -131,12 +139,14 @@ export const Collections: React.FC = () => {
                     setMemberId(selected);
                     if (selected) {
                       const b = balances.find(b => b.memberId === selected);
-                      if (b && b.balance > 0) {
-                        setAmount(String(Math.round(b.balance)));
+                      const bal = b?.balance ?? 0;
+                      const fundNote = b && b.fundNet > 0 && bal > 0 ? `含公費 ${fmt(b.fundNet)}` : '';
+                      if (bal > 0) {
+                        setAmount(String(Math.round(bal)));
                         setCollType('collect');
-                        setNote('');
-                      } else if (b && b.balance < 0) {
-                        setAmount(String(Math.round(Math.abs(b.balance))));
+                        setNote(fundNote);
+                      } else if (bal < 0) {
+                        setAmount(String(Math.round(Math.abs(bal))));
                         setCollType('payout');
                         setNote('退款');
                       } else {
